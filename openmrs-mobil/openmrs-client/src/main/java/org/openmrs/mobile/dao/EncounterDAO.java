@@ -49,6 +49,7 @@ public class EncounterDAO {
         return new EncounterTable().insert(encounter);
     }
 
+
     public EncounterType getEncounterTypeByFormName(String formname) {
         return new Select()
                 .from(EncounterType.class)
@@ -65,6 +66,26 @@ public class EncounterDAO {
                     new ObservationTable().delete(obs.getId());
                 }
                 new EncounterTable().delete(oldLastVitalsEncounterID);
+            }
+            ObservationDAO observationDAO = new ObservationDAO();
+            long encounterID = saveEncounter(encounter, null);
+            for (Observation obs : encounter.getObservations()) {
+                observationDAO.saveObservation(obs, encounterID)
+                        .observeOn(Schedulers.io())
+                        .subscribe();
+            }
+        }
+    }
+
+    public void syncBPUPEncounters(Encounter encounter, String patientUUID) {
+        if (null != encounter) {
+            encounter.setPatientUUID(patientUUID);
+            long oldBPUPEncounter = getEncounterByUUID(encounter.getUuid());
+            if (0 != oldBPUPEncounter) {
+                for (Observation obs: new ObservationDAO().findObservationByEncounterID(oldBPUPEncounter)) {
+                    new ObservationTable().delete(obs.getId());
+                }
+                new EncounterTable().delete(oldBPUPEncounter);
             }
             ObservationDAO observationDAO = new ObservationDAO();
             long encounterID = saveEncounter(encounter, null);
@@ -291,7 +312,7 @@ public class EncounterDAO {
 
         String where = String.format("%s = ?", EncounterTable.Column.PATIENT_UUID);
         String[] whereArgs = new String[]{patientUUID};
-        final Cursor cursor = helper.getReadableDatabase().query(EncounterTable.TABLE_NAME, null, null , null, null, null, null);
+        final Cursor cursor = helper.getReadableDatabase().query(EncounterTable.TABLE_NAME, null, where , whereArgs, null, null, null);
         if (null != cursor) {
             try {
                 while (cursor.moveToNext()) {
@@ -320,9 +341,7 @@ public class EncounterDAO {
                     encounter.setEncounterDatetime(DateUtils.convertTime(datetime, DateUtils.OPEN_MRS_REQUEST_FORMAT));
                     encounter.setObservations(new ObservationDAO().findObservationByEncounterID(id));
                     encounter.setForm(FormService.getFormByUuid(formUuid));
-                    /*PatientDAO patientDAO = new PatientDAO();
-                    Patient patient = patientDAO.findPatientByUUID(cursor.getString(patientUuid_CI));
-                    encounter.setPatient(patient);*/
+                    encounter.setPatientUUID(patientUuid);
                     encounters.add(encounter);
                 }
             } finally {

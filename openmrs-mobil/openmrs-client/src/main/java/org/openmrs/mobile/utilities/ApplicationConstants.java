@@ -95,6 +95,7 @@ public abstract class ApplicationConstants {
 
     public abstract static class EncounterTypes {
         public static final String VITALS = "67a71486-1a54-468f-ac3e-7091a9a79584";
+        public static final String VITALSBPUP = "d9bf9142-f315-4079-9190-bc6f9807d9dd"; // added by hector
         //public static final String VITALS = "40fd285b-c6f8-4862-944f-5603645fc749";
 
         public static String[] ENCOUNTER_TYPES_DISPLAYS = {EncounterType.VITALS, EncounterType.ADMISSION,

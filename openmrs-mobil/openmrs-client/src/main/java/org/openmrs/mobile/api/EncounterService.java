@@ -130,6 +130,12 @@ public class EncounterService extends IntentService {
                         Log.d("EncounterS.java", "onResponse success");
 
                         Encounter encounter = response.body();
+                        encounter.setPatientUUID(encountercreate.getPatient());
+                        try {
+                            Log.d("EncounterS.java", encounter.getPatientUUID());
+                        } catch (Exception e){
+                            Log.d("EncounterS.java",e.getMessage());
+                        }
                         if (encounter.getVisit()!=null)
                             linkvisit(encountercreate.getPatientId(),encountercreate.getFormname(), encounter, encountercreate);
                         encountercreate.setSynced(true);

@@ -64,9 +64,10 @@ public class EncounterService extends IntentService {
                         }
                     });
         }
-        else
+        else {
             ToastUtil.error("No internet connection. Form data is saved locally " +
                     "and will sync when internet connection is restored. ");
+        }
     }
 
     public void addEncounter(final Encountercreate encountercreate) {
@@ -130,6 +131,7 @@ public class EncounterService extends IntentService {
                         Log.d("EncounterS.java", "onResponse success");
 
                         Encounter encounter = response.body();
+                        encounter.setPatientUUID(encountercreate.getPatient());
                         if (encounter.getVisit()!=null)
                             linkvisit(encountercreate.getPatientId(),encountercreate.getFormname(), encounter, encountercreate);
                         encountercreate.setSynced(true);

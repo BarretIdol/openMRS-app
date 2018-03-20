@@ -17,10 +17,12 @@ package org.openmrs.mobile.activities.patientdashboard.visits;
 import org.openmrs.mobile.activities.patientdashboard.PatientDashboardContract;
 import org.openmrs.mobile.activities.patientdashboard.PatientDashboardMainPresenterImpl;
 import org.openmrs.mobile.api.retrofit.VisitApi;
+import org.openmrs.mobile.dao.EncounterDAO;
 import org.openmrs.mobile.dao.PatientDAO;
 import org.openmrs.mobile.dao.VisitDAO;
 import org.openmrs.mobile.listeners.retrofit.DefaultResponseCallbackListener;
 import org.openmrs.mobile.listeners.retrofit.StartVisitResponseListenerCallback;
+import org.openmrs.mobile.models.Encounter;
 import org.openmrs.mobile.models.Patient;
 import org.openmrs.mobile.utilities.NetworkUtils;
 
@@ -29,20 +31,20 @@ import rx.android.schedulers.AndroidSchedulers;
 public class PatientDashboardVisitsPresenter extends PatientDashboardMainPresenterImpl implements PatientDashboardContract.PatientVisitsPresenter {
 
     private PatientDashboardContract.ViewPatientVisits mPatientVisitsView;
-    private VisitDAO visitDAO;
+    private EncounterDAO visitDAO;
     private VisitApi visitApi;
 
     public PatientDashboardVisitsPresenter(String id, PatientDashboardContract.ViewPatientVisits mPatientVisitsView) {
         this.mPatient = new PatientDAO().findPatientByID(id);
         this.mPatientVisitsView = mPatientVisitsView;
         this.mPatientVisitsView.setPresenter(this);
-        this.visitDAO = new VisitDAO();
+        this.visitDAO = new EncounterDAO();
         this.visitApi = new VisitApi();
     }
 
     public PatientDashboardVisitsPresenter(Patient patient,
                                            PatientDashboardContract.ViewPatientVisits mPatientVisitsView,
-                                           VisitDAO visitDAO,
+                                           EncounterDAO visitDAO,
                                            VisitApi visitApi) {
         this.mPatient = patient;
         this.mPatientVisitsView = mPatientVisitsView;
@@ -53,7 +55,7 @@ public class PatientDashboardVisitsPresenter extends PatientDashboardMainPresent
 
     @Override
     public void subscribe() {
-        addSubscription(visitDAO.getVisitsByPatientID(mPatient.getId())
+        addSubscription(visitDAO.findEncountersByPatientUuid(mPatient.getUuid())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(patientVisits -> {
                     if (patientVisits !=null && patientVisits.isEmpty()) {
@@ -61,7 +63,7 @@ public class PatientDashboardVisitsPresenter extends PatientDashboardMainPresent
                     }
                     else {
                         mPatientVisitsView.toggleRecyclerListVisibility(true);
-                        mPatientVisitsView.setVisitsToDisplay(patientVisits);
+                        mPatientVisitsView.setVisitsToDisplay(patientVisits,mPatient.getEncountercreates());
                     }
                 }));
         getVisitFromDB();
@@ -70,7 +72,7 @@ public class PatientDashboardVisitsPresenter extends PatientDashboardMainPresent
 
 
     public void getVisitFromDB(){
-        visitDAO.getVisitsByPatientID(mPatient.getId())
+        visitDAO.findEncountersByPatientUuid(mPatient.getUuid())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(patientVisits -> {
                     if (patientVisits !=null && patientVisits.isEmpty()) {
@@ -78,14 +80,14 @@ public class PatientDashboardVisitsPresenter extends PatientDashboardMainPresent
                     }
                     else {
                         mPatientVisitsView.toggleRecyclerListVisibility(true);
-                        mPatientVisitsView.setVisitsToDisplay(patientVisits);
+                        mPatientVisitsView.setVisitsToDisplay(patientVisits,mPatient.getEncountercreates());
                     }
                 });
     }
 
     public void getVisitFromServer(){
         if (NetworkUtils.isOnline()) {
-            new VisitApi().syncVisitsData(mPatient, new DefaultResponseCallbackListener() {
+            new VisitApi().syncLastVitals(mPatient.getUuid(), new DefaultResponseCallbackListener() {
                 @Override
                 public void onResponse() {
                     getVisitFromDB();
@@ -101,7 +103,7 @@ public class PatientDashboardVisitsPresenter extends PatientDashboardMainPresent
     }
     @Override
     public void showStartVisitDialog() {
-        addSubscription(visitDAO.getActiveVisitByPatientId(mPatient.getId())
+      /*  addSubscription(visitDAO.getActiveVisitByPatientId(mPatient.getId())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(visit -> {
                     if(visit != null){
@@ -113,11 +115,12 @@ public class PatientDashboardVisitsPresenter extends PatientDashboardMainPresent
                     } else {
                         mPatientVisitsView.showStartVisitDialog(true);
                     }
-                }));
+                }));*/
     }
 
     @Override
     public void syncVisits() {
+        /*
         mPatientVisitsView.showStartVisitProgressDialog();
         visitApi.syncVisitsData(mPatient, new DefaultResponseCallbackListener() {
             @Override
@@ -135,11 +138,12 @@ public class PatientDashboardVisitsPresenter extends PatientDashboardMainPresent
                 mPatientVisitsView.dismissCurrentDialog();
                 mPatientVisitsView.showErrorToast(errorMessage);
             }
-        });
+        });*/
     }
 
     @Override
     public void startVisit() {
+        /*
         mPatientVisitsView.showStartVisitProgressDialog();
         visitApi.startVisit(mPatient, new StartVisitResponseListenerCallback() {
             @Override
@@ -156,6 +160,6 @@ public class PatientDashboardVisitsPresenter extends PatientDashboardMainPresent
                 mPatientVisitsView.showErrorToast(errorMessage);
                 mPatientVisitsView.dismissCurrentDialog();
             }
-        });
+        });*/
     }
 }

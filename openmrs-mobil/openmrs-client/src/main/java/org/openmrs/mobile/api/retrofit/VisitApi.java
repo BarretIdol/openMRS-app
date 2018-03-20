@@ -128,13 +128,17 @@ public class VisitApi {
     }
 
     public void syncLastVitals(final String patientUuid, @Nullable final DefaultResponseCallbackListener callbackListener) {
-        Call<Results<Encounter>> call = restApi.getLastVitals(patientUuid, ApplicationConstants.EncounterTypes.VITALS, "full", 1,"desc");
+        //Call<Results<Encounter>> call = restApi.getLastVitals(patientUuid, ApplicationConstants.EncounterTypes.VITALS, "full", 1,"desc");
+        Call<Results<Encounter>> call = restApi.getLastVitals(patientUuid, ApplicationConstants.EncounterTypes.VITALSBPUP, "full", 100,"desc"); // changed by hector
         call.enqueue(new Callback<Results<Encounter>>() {
             @Override
             public void onResponse(Call<Results<Encounter>> call, Response<Results<Encounter>> response) {
                 if (response.isSuccessful()) {
                     if (!response.body().getResults().isEmpty()) {
-                        encounterDAO.saveLastVitalsEncounter(response.body().getResults().get(0), patientUuid);
+                        for (Encounter e : response.body().getResults()) {
+                            //encounterDAO.saveLastVitalsEncounter(e, patientUuid);
+                            encounterDAO.syncBPUPEncounters(e,patientUuid); // changed by hector
+                        }
                     }
                     if (callbackListener != null) {
                         callbackListener.onResponse();

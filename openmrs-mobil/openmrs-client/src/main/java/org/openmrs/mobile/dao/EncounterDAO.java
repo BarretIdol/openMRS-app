@@ -320,6 +320,7 @@ public class EncounterDAO {
                     int uuid_CI = cursor.getColumnIndex(EncounterTable.Column.UUID);
                     int display_CI = cursor.getColumnIndex(EncounterTable.Column.DISPLAY);
                     int datetime_CI = cursor.getColumnIndex(EncounterTable.Column.ENCOUNTER_DATETIME);
+                    //int location_CI = cursor.getColumnIndex(EncounterTable.Column.)
                     int encounterType_CI = cursor.getColumnIndex(EncounterTable.Column.ENCOUNTER_TYPE);
                     int formUuid_CI = cursor.getColumnIndex(EncounterTable.Column.FORM_UUID);
                     int visit_CI = cursor.getColumnIndex(EncounterTable.Column.VISIT_KEY_ID);
@@ -350,5 +351,13 @@ public class EncounterDAO {
         }
 
         return encounters;
+    }
+
+
+    // added by Hector
+    public Observable<List<Encounter>> findEncountersByPatientUuid(String patientUUID) {
+        return createObservableIO(() -> {
+            return findEncountersByPatientID(patientUUID);
+        });
     }
 }

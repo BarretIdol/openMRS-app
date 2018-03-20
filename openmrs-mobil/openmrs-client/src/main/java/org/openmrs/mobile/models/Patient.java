@@ -144,6 +144,22 @@ public class Patient extends Resource implements Serializable{
          this.encounters=encounters;
     }
 
+    public List<Encountercreate> getEncountercreates() { //added by Hector
+        List<Encountercreate> ret = new ArrayList<Encountercreate>();
+     /*   if (encounters!="") {
+            if (encounters.contains(",")) {
+                String [] enc = encounters.split(",");
+                for (String s: enc) {
+                    ret.add(new Encountercreate().load(Encountercreate.class,Long.parseLong(s)));
+
+                }
+            }
+            else {
+                ret.add(new Encountercreate().load(Encountercreate.class,Long.parseLong(encounters)));
+            }
+        }*/
+        return ret;
+    }
 
     public void addEncounters(Long encid)
     {

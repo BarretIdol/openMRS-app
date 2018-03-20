@@ -61,7 +61,7 @@ public class FormListActivity extends ACBaseActivity {
             mPatientID = bundle.getLong(ApplicationConstants.BundleKeys.PATIENT_ID_BUNDLE);
         }
         new FormListPresenter(formListFragment, mPatientID);
-        Patient mPatient =new PatientDAO().findPatientByID(Long.toString(mPatientID));
+       /* Patient mPatient =new PatientDAO().findPatientByID(Long.toString(mPatientID));
         //String prova = mPatient.getEncounters();
         String encnters = mPatient.getEncounters();
         EncounterDAO eco = new EncounterDAO();
@@ -69,7 +69,7 @@ public class FormListActivity extends ACBaseActivity {
         EncounterType et= new EncounterType();
         et.setDisplay(et.VITALSBPUP);
         eco.getAllEncountersByType2(mPatientID,et);
-        int OROR = prova.size();  // prueba
+        int OROR = prova.size();  // prueba*/
 
     }
 

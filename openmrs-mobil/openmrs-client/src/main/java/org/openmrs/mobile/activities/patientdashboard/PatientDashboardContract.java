@@ -17,6 +17,7 @@ package org.openmrs.mobile.activities.patientdashboard;
 import org.openmrs.mobile.activities.BasePresenterContract;
 import org.openmrs.mobile.activities.BaseView;
 import org.openmrs.mobile.models.Encounter;
+import org.openmrs.mobile.models.Encountercreate;
 import org.openmrs.mobile.models.Patient;
 import org.openmrs.mobile.models.Visit;
 
@@ -50,7 +51,7 @@ public interface PatientDashboardContract {
         void showErrorToast(String message);
         void dismissCurrentDialog();
         void toggleRecyclerListVisibility(boolean isVisible);
-        void setVisitsToDisplay(List<Visit> visits);
+        void setVisitsToDisplay(List<Encounter> visits, List<Encountercreate> encountercreates);
         void goToVisitDashboard(Long visitID);
         void showStartVisitDialog(boolean isVisitPossible);
         void showStartVisitProgressDialog();

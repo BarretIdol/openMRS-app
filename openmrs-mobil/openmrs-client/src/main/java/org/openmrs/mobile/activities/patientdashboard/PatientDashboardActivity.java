@@ -111,7 +111,7 @@ public class PatientDashboardActivity extends ACBaseActivity {
         ArrayList<String> tabNames = new ArrayList<>();
         tabNames.add(getString(R.string.patient_scroll_tab_details_label));
         tabNames.add(getString(R.string.patient_scroll_tab_diagnosis_label));
-        tabNames.add(getString(R.string.patient_scroll_tab_visits_label));
+        tabNames.add(getString(R.string.patient_scroll_tab_encounters_label));
         tabNames.add(getString(R.string.patient_scroll_tab_vitals_label));
         tabNames.add(getString(R.string.patient_scroll_tab_charts_label));
         return tabNames;

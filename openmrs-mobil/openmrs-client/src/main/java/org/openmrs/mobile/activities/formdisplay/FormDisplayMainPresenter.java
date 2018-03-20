@@ -14,6 +14,8 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.SparseArray;
 
+import com.activeandroid.Model;
+
 import org.joda.time.LocalDateTime;
 import org.openmrs.mobile.activities.BasePresenter;
 import org.openmrs.mobile.api.EncounterService;
@@ -37,6 +39,7 @@ import org.openmrs.mobile.utilities.ApplicationConstants;
 import org.openmrs.mobile.utilities.DateUtils;
 import org.openmrs.mobile.utilities.FormService;
 import org.openmrs.mobile.utilities.InputField;
+import org.openmrs.mobile.utilities.NetworkUtils;
 import org.openmrs.mobile.utilities.SelectOneField;
 import org.openmrs.mobile.utilities.ToastUtil;
 import org.openmrs.mobile.application.OpenMRS;
@@ -166,31 +169,6 @@ public class FormDisplayMainPresenter extends BasePresenter implements FormDispl
             encountercreate.setObslist();
             encountercreate.save();
 
-           /* encounter.setObservations(encounter_obs);
-            Visit visita = new Visit();
-            visita.setStartDatetime(DateUtils.convertTime(System.currentTimeMillis(), DateUtils.OPEN_MRS_REQUEST_FORMAT));
-            visita.setPatient(mPatient);
-            LocationDAO locationDAO = new LocationDAO();
-            visita.setLocation(locationDAO.findLocationByName(OpenMRS.getInstance().getLocation()));
-            visita.setVisitType(new VisitType(null, OpenMRS.getInstance().getVisitTypeUUID()));
-            visita.setUuid(UUID.randomUUID().toString());
-            Random randomlong = new Random();
-            long idd= randomlong.nextLong();
-            visita.setId(idd);
-            List<Encounter> encounters = new ArrayList<>();
-            encounters.add(encounter);
-            visita.setEncounters(encounters);*/
-           // visita.setStopDatetime(DateUtils.convertTime(System.currentTimeMillis(), DateUtils.OPEN_MRS_REQUEST_FORMAT));
-          /*  VisitDAO vd = new VisitDAO();
-            vd.saveVisit(visita, mPatient.getId());*/
-           // la api de visita no me crea nada
-           /* VisitApi visitApi = new VisitApi();
-            visitApi.createVisitProva(visita.getPatient(),null,visita);^*/
-
-            // de esta manera puedo acceder a los encountercreate guardados
-            /*Encountercreate prova = new Encountercreate();
-            prova = prova.load(prova.getClass(), encountercreate.getId());
-            prova.getFormUuid();*/
             if(!mPatient.isSynced()) {
                 mPatient.addEncounters(encountercreate.getId());
                 new PatientDAO().updatePatient(mPatient.getId(),mPatient);
@@ -199,6 +177,9 @@ public class FormDisplayMainPresenter extends BasePresenter implements FormDispl
                 mFormDisplayView.enableSubmitButton(true);
             }
             else {
+                if (!NetworkUtils.isOnline()) { //añadido por hector
+                    mPatient.addEncounters(encountercreate.getId());
+                }
                 new EncounterService().addEncounter(encountercreate, new DefaultResponseCallbackListener() {
                     @Override
                     public void onResponse() {

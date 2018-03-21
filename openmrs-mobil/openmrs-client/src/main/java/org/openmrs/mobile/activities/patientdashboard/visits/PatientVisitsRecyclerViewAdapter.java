@@ -80,7 +80,7 @@ public class PatientVisitsRecyclerViewAdapter extends RecyclerView.Adapter<Patie
         encounterViewHolder.mRelativeLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               // mContext.goToVisitDashboard(mVisits.get(adapterPos).getId());
+                mContext.goToVisitDashboard(mEncounters.get(adapterPos).getId());
             }
         });
     }

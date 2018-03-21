@@ -14,7 +14,7 @@
 
 package org.openmrs.mobile.activities.patientdashboard.visits;
 
-import android.graphics.drawable.Drawable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,22 +25,21 @@ import android.widget.TextView;
 import org.openmrs.mobile.R;
 import org.openmrs.mobile.models.Encounter;
 import org.openmrs.mobile.models.Encountercreate;
-import org.openmrs.mobile.models.Visit;
 import org.openmrs.mobile.utilities.DateUtils;
 import org.openmrs.mobile.utilities.FontsUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PatientVisitsRecyclerViewAdapter extends RecyclerView.Adapter<PatientVisitsRecyclerViewAdapter.EncounterViewHolder> {
     private PatientVisitsFragment mContext;
-    private List<Encounter> mEncounters;
-    private List<Encountercreate> mEncountercreate;
+    private List<Object> mData = new ArrayList<>();
 
 
-    public PatientVisitsRecyclerViewAdapter(PatientVisitsFragment context, List<Encounter> items,List<Encountercreate> encountercreate) { // modified
+    public PatientVisitsRecyclerViewAdapter(PatientVisitsFragment context, List<Encounter> items, List<Encountercreate> encountercreate) { // modified
         this.mContext = context;
-        this.mEncounters = items;
-        this.mEncountercreate = encountercreate;
+        mData.addAll(items);
+        mData.addAll(encountercreate);
     }
 
     @Override
@@ -53,11 +52,22 @@ public class PatientVisitsRecyclerViewAdapter extends RecyclerView.Adapter<Patie
     @Override
     public void onBindViewHolder(EncounterViewHolder encounterViewHolder, final int position) {
         final int adapterPos = encounterViewHolder.getAdapterPosition();
-        Encounter encounter = mEncounters.get(adapterPos);
-        encounterViewHolder.mEncounterDate.setText(DateUtils.convertTime1(encounter.getEncounterDate(), DateUtils.DATE_WITH_TIME_FORMAT));
-        if (encounter.getLocation() !=  null) {
-            encounterViewHolder.mEncounterPlace.setText("in " + encounter.getLocation().getDisplay());
+
+        if (mData.get(adapterPos) instanceof Encounter) {
+            Encounter encounter = (Encounter) mData.get(adapterPos);
+            encounterViewHolder.mEncounterDate.setText(DateUtils.convertTime1(encounter.getEncounterDate(), DateUtils.DATE_WITH_TIME_FORMAT));
+            encounterViewHolder.mEncounterDate.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
+            if (encounter.getLocation() !=  null) {
+                encounterViewHolder.mEncounterPlace.setText("in " + encounter.getLocation().getDisplay());
+            }
+
+        } else if (mData.get(adapterPos) instanceof  Encountercreate){
+            Encountercreate encounterCreate = (Encountercreate) mData.get(adapterPos);
+            // TO DO EncounterCreate hasn't encounterDate
+            encounterViewHolder.mEncounterDate.setText(encounterCreate.getId().toString());
+            encounterViewHolder.mEncounterDate.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(mContext.getContext(), R.drawable.past_visit_dot), null, null, null);
         }
+
        /* if (DateUtils.convertTime(visit.getStopDatetime()) != null) {
             visitViewHolder.mVisitEnd.setVisibility(View.VISIBLE);
             visitViewHolder.mVisitEnd.setText(DateUtils.convertTime1((visit.getStopDatetime()), DateUtils.DATE_WITH_TIME_FORMAT));
@@ -80,7 +90,7 @@ public class PatientVisitsRecyclerViewAdapter extends RecyclerView.Adapter<Patie
         encounterViewHolder.mRelativeLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mContext.goToVisitDashboard(mEncounters.get(adapterPos).getId());
+               // mContext.goToVisitDashboard(mEncounters.get(adapterPos).getId());
             }
         });
     }
@@ -92,7 +102,7 @@ public class PatientVisitsRecyclerViewAdapter extends RecyclerView.Adapter<Patie
 
     @Override
     public int getItemCount() {
-        return mEncounters.size();
+        return mData.size();
     }
 
     class EncounterViewHolder extends RecyclerView.ViewHolder{

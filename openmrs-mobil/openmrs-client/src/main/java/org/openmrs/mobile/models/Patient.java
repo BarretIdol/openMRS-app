@@ -10,6 +10,8 @@
 
 package org.openmrs.mobile.models;
 
+import android.text.TextUtils;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -146,7 +148,7 @@ public class Patient extends Resource implements Serializable{
 
     public List<Encountercreate> getEncountercreates() { //added by Hector
         List<Encountercreate> ret = new ArrayList<Encountercreate>();
-     /*   if (encounters!="") {
+        if (!TextUtils.isEmpty(encounters)) {
             if (encounters.contains(",")) {
                 String [] enc = encounters.split(",");
                 for (String s: enc) {
@@ -157,7 +159,7 @@ public class Patient extends Resource implements Serializable{
             else {
                 ret.add(new Encountercreate().load(Encountercreate.class,Long.parseLong(encounters)));
             }
-        }*/
+        }
         return ret;
     }
 

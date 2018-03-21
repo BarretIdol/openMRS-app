@@ -177,13 +177,14 @@ public class FormDisplayMainPresenter extends BasePresenter implements FormDispl
                 mFormDisplayView.enableSubmitButton(true);
             }
             else {
-                if (!NetworkUtils.isOnline()) { //añadido por hector
-                    mPatient.addEncounters(encountercreate.getId());
-                }
+                mPatient.addEncounters(encountercreate.getId());
+                new PatientDAO().updatePatient(mPatientID,mPatient);
                 new EncounterService().addEncounter(encountercreate, new DefaultResponseCallbackListener() {
                     @Override
                     public void onResponse() {
                         mFormDisplayView.enableSubmitButton(true);
+                        //mPatient.deleteEncounter(encountercreate.getId()); needs to be done
+                        new PatientDAO().updatePatient(mPatientID,mPatient);
                     }
                     @Override
                     public void onErrorResponse(String errorMessage) {

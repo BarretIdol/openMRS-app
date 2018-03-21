@@ -28,6 +28,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import org.openmrs.mobile.R;
+import org.openmrs.mobile.activities.formview.FormViewActivity;
 import org.openmrs.mobile.activities.patientdashboard.PatientDashboardActivity;
 import org.openmrs.mobile.activities.patientdashboard.PatientDashboardContract;
 import org.openmrs.mobile.activities.patientdashboard.PatientDashboardFragment;
@@ -126,8 +127,8 @@ public class PatientVisitsFragment extends PatientDashboardFragment implements P
 
     @Override
     public void goToVisitDashboard(Long visitID) {
-        Intent intent = new Intent(this.getActivity(), VisitDashboardActivity.class);
-        intent.putExtra(ApplicationConstants.BundleKeys.VISIT_ID, visitID);
+        Intent intent = new Intent(this.getActivity(), FormViewActivity.class);
+        intent.putExtra(ApplicationConstants.BundleKeys.ENCOUNTER_ID, visitID);
         startActivityForResult(intent, REQUEST_CODE_FOR_VISIT);
     }
 

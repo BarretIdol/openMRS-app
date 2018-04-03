@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'android-apt'
 
 buildscript {
 
@@ -20,7 +19,7 @@ def version = "2.6.1-beta"
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.2"
+    buildToolsVersion '26.0.2'
     useLibrary 'org.apache.http.legacy'
 
     def travisBuildNumber = System.getenv("TRAVIS_BUILD_NUMBER")
@@ -122,7 +121,7 @@ dependencies {
     compile 'io.reactivex:rxandroid:1.2.1'
     compile 'com.jakewharton.rxbinding:rxbinding:1.0.0'
     compile 'com.github.hotchemi:permissionsdispatcher:2.3.1'
-    apt 'com.github.hotchemi:permissionsdispatcher-processor:2.3.1'
+    annotationProcessor 'com.github.hotchemi:permissionsdispatcher-processor:2.3.1'
     compile 'org.adw.library:discrete-seekbar:1.0.1'
     compile 'com.github.PhilJay:MPAndroidChart:v3.0.2'
     compile 'com.github.amlcurran.showcaseview:library:5.4.3'

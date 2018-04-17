@@ -14,6 +14,7 @@
 
 package org.openmrs.mobile.activities.patientdashboard;
 
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -30,15 +31,17 @@ import org.openmrs.mobile.activities.patientdashboard.visits.PatientDashboardVis
 import org.openmrs.mobile.activities.patientdashboard.visits.PatientVisitsFragment;
 import org.openmrs.mobile.activities.patientdashboard.vitals.PatientDashboardVitalsPresenter;
 import org.openmrs.mobile.activities.patientdashboard.vitals.PatientVitalsFragment;
+import org.openmrs.mobile.models.EncounterType;
+import org.openmrs.mobile.utilities.ApplicationConstants;
 
 class PatientDashboardPagerAdapter extends FragmentPagerAdapter {
 
     private static final int TAB_COUNT = 5;
 
     private static final int DETAILS_TAB_POS = 0;
-    private static final int DIAGNOSIS_TAB_POS = 1;
-    private static final int VISITS_TAB_POS = 2;
-    private static final int VITALS_TAB_POS = 3;
+    private static final int PERSONAL_TAB_POS = 1;
+    private static final int FORMS_TAB_POS = 2;
+    private static final int FACTORS_TAB_POS = 3;
     private static final int CHARTS_TAB_POS = 4;
 
     private SparseArray<Fragment> registeredFragments = new SparseArray<>();
@@ -52,22 +55,27 @@ class PatientDashboardPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int i) {
+        Bundle data = new Bundle();
         switch (i) {
             case DETAILS_TAB_POS:
                 PatientDetailsFragment patientDetailsFragment = PatientDetailsFragment.newInstance();
                 new PatientDashboardDetailsPresenter(mPatientId, patientDetailsFragment);
                 return patientDetailsFragment;
-            case DIAGNOSIS_TAB_POS:
-                PatientDiagnosisFragment patientDiagnosisFragment = PatientDiagnosisFragment.newInstance();
-                new PatientDashboardDiagnosisPresenter(mPatientId, patientDiagnosisFragment);
-                return patientDiagnosisFragment;
-            case VISITS_TAB_POS:
+            case PERSONAL_TAB_POS:
+                PatientVitalsFragment patientPersonalFragment = PatientVitalsFragment.newInstance();
+                data.putString(ApplicationConstants.BundleKeys.ENCOUNTERTYPE,EncounterType.PERSONAL_DATA);
+                patientPersonalFragment.setArguments(data);
+                new PatientDashboardVitalsPresenter(mPatientId, patientPersonalFragment,""); //why?
+                return patientPersonalFragment;
+            case FORMS_TAB_POS:
                 PatientVisitsFragment patientVisitsFragment = PatientVisitsFragment.newInstance();
                 new PatientDashboardVisitsPresenter(mPatientId, patientVisitsFragment);
                 return patientVisitsFragment;
-            case VITALS_TAB_POS:
+            case FACTORS_TAB_POS:
                 PatientVitalsFragment patientVitalsFragment = PatientVitalsFragment.newInstance();
-                new PatientDashboardVitalsPresenter(mPatientId, patientVitalsFragment);
+                data.putString(ApplicationConstants.BundleKeys.ENCOUNTERTYPE,EncounterType.RISK_FACTORS);
+                patientVitalsFragment.setArguments(data);
+                new PatientDashboardVitalsPresenter(mPatientId, patientVitalsFragment,""); //why?
                 return patientVitalsFragment;
             case CHARTS_TAB_POS:
                 PatientChartsFragment patientChartsFragment = PatientChartsFragment.newInstance();

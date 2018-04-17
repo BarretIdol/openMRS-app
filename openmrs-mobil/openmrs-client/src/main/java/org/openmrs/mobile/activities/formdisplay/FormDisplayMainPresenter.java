@@ -12,6 +12,7 @@ package org.openmrs.mobile.activities.formdisplay;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.util.SparseArray;
 
 import com.activeandroid.Model;
@@ -38,6 +39,7 @@ import org.openmrs.mobile.models.VisitType;
 import org.openmrs.mobile.utilities.ApplicationConstants;
 import org.openmrs.mobile.utilities.DateUtils;
 import org.openmrs.mobile.utilities.FormService;
+import org.openmrs.mobile.utilities.Gps;
 import org.openmrs.mobile.utilities.InputField;
 import org.openmrs.mobile.utilities.NetworkUtils;
 import org.openmrs.mobile.utilities.SelectOneField;
@@ -79,12 +81,13 @@ public class FormDisplayMainPresenter extends BasePresenter implements FormDispl
     public void createEncounter() {
         List<InputField> inputFields = new ArrayList<>();
         List<SelectOneField> radioGroupFields = new ArrayList<>();
-        FormService fs = new FormService();
+        //FormService fs = new FormService();
         mFormDisplayView.enableSubmitButton(false);
-
+        String localDateTime1 = new LocalDateTime().toString();
         Encountercreate encountercreate=new Encountercreate();
         encountercreate.setPatient(mPatient.getUuid());
         encountercreate.setEncounterType(mEncountertype);
+       // encountercreate.setDateTime(localDateTime1);
         List<Obscreate> observations=new ArrayList<>();
 
        /* EncounterDAO encDAO = new EncounterDAO();
@@ -113,8 +116,8 @@ public class FormDisplayMainPresenter extends BasePresenter implements FormDispl
         }
 
         if(valid) {
-            for (InputField input: inputFields) {
-                if(input.getValue()!=-1.0) {
+            for (InputField input: inputFields) {//changed by hector
+                if(!TextUtils.isEmpty(input.getValue())) {
                     Obscreate obscreate = new Obscreate();
                     obscreate.setConcept(input.getConcept());
                     obscreate.setValue(String.valueOf(input.getValue()));
@@ -122,18 +125,6 @@ public class FormDisplayMainPresenter extends BasePresenter implements FormDispl
                     obscreate.setObsDatetime(localDateTime.toString());
                     obscreate.setPerson(mPatient.getUuid());
                     observations.add(obscreate);
-                    // prueba por hector, cuando intenta cargar el encounter con observaciones falla (hace falta algo)
-                    // necesita arreglarse, de momento el encounter tiene una lista vacia de obs
-                  /*  Observation obs = new Observation();
-                    obs.setObsDatetime(localDateTime.toString());
-                    obs.setPerson(mPatient.getPerson());
-                    obs.setId(new Random().nextLong());
-                    obs.setEncounterID(encounter.getId());
-                    obs.setDisplayValue(String.valueOf(input.getValue()));
-                    ConceptDAO cd = new ConceptDAO();
-                    obs.setUuid(UUID.randomUUID().toString());
-                    obs.setConcept(cd.findConceptsByUUID(input.getConcept()));
-                    encounter_obs.add(obs);*/
                 }
             }
 
@@ -146,19 +137,6 @@ public class FormDisplayMainPresenter extends BasePresenter implements FormDispl
                     obscreate.setObsDatetime(localDateTime.toString());
                     obscreate.setPerson(mPatient.getUuid());
                     observations.add(obscreate);
-                    // prueba por hector, cuando intenta cargar el encounter con observaciones falla (hace falta algo)
-                    // necesita arreglarse, de momento el encounter tiene una lista vacia de obs
-                  /*  Observation obs = new Observation();
-                    obs.setPerson(mPatient.getPerson());
-                    obs.setObsDatetime(localDateTime.toString());
-                    obs.setId(new Random().nextLong());
-                    obs.setEncounterID(encounter.getId());
-                    obs.setEncounter(encounter);
-                    obs.setUuid(UUID.randomUUID().toString());
-                    obs.setDisplayValue(radioGroupField.getChosenAnswer().getConcept());
-                    ConceptDAO cd = new ConceptDAO();
-                    obs.setConcept(cd.findConceptsByUUID(radioGroupField.getConcept()));
-                    encounter_obs.add(obs);*/
                 }
             }
 
@@ -168,6 +146,8 @@ public class FormDisplayMainPresenter extends BasePresenter implements FormDispl
             encountercreate.setFormUuid(getFormResourceByName(mFormname).getUuid());
             encountercreate.setObslist();
             encountercreate.save();
+          /*  Encountercreate prova = new Encountercreate().load(Encountercreate.class,encountercreate.getId());
+            prova.getSynced();*/
 
             if(!mPatient.isSynced()) {
                 mPatient.addEncounters(encountercreate.getId());
@@ -183,8 +163,8 @@ public class FormDisplayMainPresenter extends BasePresenter implements FormDispl
                     @Override
                     public void onResponse() {
                         mFormDisplayView.enableSubmitButton(true);
-                        //mPatient.deleteEncounter(encountercreate.getId()); needs to be done
-                        new PatientDAO().updatePatient(mPatientID,mPatient);
+                        //mPatient.deleteEncounter(encountercreate.getId()); needs to be done, to safe space?
+                        //new PatientDAO().updatePatient(mPatientID,mPatient);
                     }
                     @Override
                     public void onErrorResponse(String errorMessage) {

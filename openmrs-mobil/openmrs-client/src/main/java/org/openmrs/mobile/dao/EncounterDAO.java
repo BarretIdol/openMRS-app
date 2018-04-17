@@ -23,6 +23,7 @@ import com.activeandroid.query.Select;
 import net.sqlcipher.Cursor;
 
 import org.openmrs.mobile.activities.formlist.FormListActivity;
+import org.openmrs.mobile.application.OpenMRS;
 import org.openmrs.mobile.databases.DBOpenHelper;
 import org.openmrs.mobile.databases.OpenMRSDBOpenHelper;
 import org.openmrs.mobile.databases.tables.EncounterTable;
@@ -77,6 +78,7 @@ public class EncounterDAO {
         }
     }
 
+    //added by Hector
     public void syncBPUPEncounters(Encounter encounter, String patientUUID) {
         if (null != encounter) {
             encounter.setPatientUUID(patientUUID);
@@ -116,13 +118,55 @@ public class EncounterDAO {
         return encounterID;
     }
 
-    public Observable<Encounter> getLastVitalsEncounter(String patientUUID) {
+    public Observable<Encounter> getLastVitalsEncounter(String patientUUID) {  //changed
         return createObservableIO(() -> {
             DBOpenHelper helper = OpenMRSDBOpenHelper.getInstance().getDBOpenHelper();
             Encounter encounter = null;
 
             String where = String.format("%s = ? AND %s = ? ORDER BY %s DESC LIMIT 1", EncounterTable.Column.PATIENT_UUID, EncounterTable.Column.ENCOUNTER_TYPE, EncounterTable.Column.ENCOUNTER_DATETIME);
             String[] whereArgs = new String[]{patientUUID, EncounterType.VITALS};
+            final Cursor cursor = helper.getReadableDatabase().query(EncounterTable.TABLE_NAME, null, where, whereArgs, null, null, null);
+            if (null != cursor) {
+                try {
+                    if (cursor.moveToFirst()) {
+                        int id_CI = cursor.getColumnIndex(EncounterTable.Column.ID);
+                        int uuid_CI = cursor.getColumnIndex(EncounterTable.Column.UUID);
+                        int display_CI = cursor.getColumnIndex(EncounterTable.Column.DISPLAY);
+                        int datetime_CI = cursor.getColumnIndex(EncounterTable.Column.ENCOUNTER_DATETIME);
+                        int formUuid_CI = cursor.getColumnIndex(EncounterTable.Column.FORM_UUID);
+                        int patientUuid_CI = cursor.getColumnIndex(EncounterTable.Column.PATIENT_UUID);
+                        Long id = cursor.getLong(id_CI);
+                        String uuid = cursor.getString(uuid_CI);
+                        String display = cursor.getString(display_CI);
+                        Long datetime = cursor.getLong(datetime_CI);
+                        String formUuid = cursor.getString(formUuid_CI);
+                        String patientUuid = cursor.getString(patientUuid_CI);
+                        encounter = new Encounter();
+                        encounter.setId(id);
+                        encounter.setUuid(uuid);
+                        encounter.setDisplay(display);
+                        encounter.setEncounterDatetime(DateUtils.convertTime(datetime, DateUtils.OPEN_MRS_REQUEST_FORMAT));
+                        encounter.setEncounterType((EncounterType) new Select().from(EncounterType.class).where("display = ?", EncounterType.VITALS).executeSingle());
+                        encounter.setObservations(new ObservationDAO().findObservationByEncounterID(id));
+                        encounter.setForm(FormService.getFormByUuid(formUuid));
+                        encounter.setPatient(new PatientDAO().findPatientByUUID(patientUuid));
+                    }
+                } finally {
+                    cursor.close();
+                }
+            }
+            return encounter;
+        });
+    }
+
+
+    public Observable<Encounter> getStaticFormEncounter(String patientUUID, String encounterType) {  //changed
+        return createObservableIO(() -> {
+            DBOpenHelper helper = OpenMRSDBOpenHelper.getInstance().getDBOpenHelper();
+            Encounter encounter = null;
+
+            String where = String.format("%s = ? AND %s = ? ORDER BY %s DESC LIMIT 1", EncounterTable.Column.PATIENT_UUID, EncounterTable.Column.ENCOUNTER_TYPE, EncounterTable.Column.ENCOUNTER_DATETIME);
+            String[] whereArgs = new String[]{patientUUID, encounterType};
             final Cursor cursor = helper.getReadableDatabase().query(EncounterTable.TABLE_NAME, null, where, whereArgs, null, null, null);
             if (null != cursor) {
                 try {
@@ -312,7 +356,7 @@ public class EncounterDAO {
 
         String where = String.format("%s = ?", EncounterTable.Column.PATIENT_UUID);
         String[] whereArgs = new String[]{patientUUID};
-        final Cursor cursor = helper.getReadableDatabase().query(EncounterTable.TABLE_NAME, null, where , whereArgs, null, null, null);
+        final Cursor cursor = helper.getReadableDatabase().query(EncounterTable.TABLE_NAME, null, where , whereArgs, null, null, EncounterTable.Column.ENCOUNTER_DATETIME + " DESC");
         if (null != cursor) {
             try {
                 while (cursor.moveToNext()) {
@@ -320,7 +364,7 @@ public class EncounterDAO {
                     int uuid_CI = cursor.getColumnIndex(EncounterTable.Column.UUID);
                     int display_CI = cursor.getColumnIndex(EncounterTable.Column.DISPLAY);
                     int datetime_CI = cursor.getColumnIndex(EncounterTable.Column.ENCOUNTER_DATETIME);
-                    //int location_CI = cursor.getColumnIndex(EncounterTable.Column.)
+                   // int location_CI = cursor.getColumnIndex(EncounterTable.Column.)
                     int encounterType_CI = cursor.getColumnIndex(EncounterTable.Column.ENCOUNTER_TYPE);
                     int formUuid_CI = cursor.getColumnIndex(EncounterTable.Column.FORM_UUID);
                     int visit_CI = cursor.getColumnIndex(EncounterTable.Column.VISIT_KEY_ID);
@@ -360,4 +404,55 @@ public class EncounterDAO {
             return findEncountersByPatientID(patientUUID);
         });
     }
+
+    public Observable<Boolean> deleteEncounterByPatientUUID(String uuid) { //added by hector
+        return createObservableIO(() -> {
+            OpenMRS.getInstance().getOpenMRSLogger().w("Encounters deleted for patient with UUID: " + uuid);
+            DBOpenHelper openHelper = OpenMRSDBOpenHelper.getInstance().getDBOpenHelper();
+            openHelper.getReadableDatabase().delete(EncounterTable.TABLE_NAME, EncounterTable.Column.PATIENT_UUID
+                    + " = " + uuid, null);
+            return true;
+        });
+    }
+    public Encounter getStaticFormEncounter1(String patientUUID, String encounterType) {  //changed
+            DBOpenHelper helper = OpenMRSDBOpenHelper.getInstance().getDBOpenHelper();
+            Encounter encounter = null;
+
+            String where = String.format("%s = ? AND %s = ? ORDER BY %s DESC LIMIT 1", EncounterTable.Column.PATIENT_UUID, EncounterTable.Column.ENCOUNTER_TYPE, EncounterTable.Column.ENCOUNTER_DATETIME);
+            String[] whereArgs = new String[]{patientUUID, encounterType};
+            final Cursor cursor = helper.getReadableDatabase().query(EncounterTable.TABLE_NAME, null, where, whereArgs, null, null, null);
+            if (null != cursor) {
+                try {
+                    if (cursor.moveToFirst()) {
+                        int id_CI = cursor.getColumnIndex(EncounterTable.Column.ID);
+                        int uuid_CI = cursor.getColumnIndex(EncounterTable.Column.UUID);
+                        int display_CI = cursor.getColumnIndex(EncounterTable.Column.DISPLAY);
+                        int datetime_CI = cursor.getColumnIndex(EncounterTable.Column.ENCOUNTER_DATETIME);
+                        int formUuid_CI = cursor.getColumnIndex(EncounterTable.Column.FORM_UUID);
+                        int patientUuid_CI = cursor.getColumnIndex(EncounterTable.Column.PATIENT_UUID);
+                        Long id = cursor.getLong(id_CI);
+                        String uuid = cursor.getString(uuid_CI);
+                        String display = cursor.getString(display_CI);
+                        Long datetime = cursor.getLong(datetime_CI);
+                        String formUuid = cursor.getString(formUuid_CI);
+                        String patientUuid = cursor.getString(patientUuid_CI);
+                        encounter = new Encounter();
+                        encounter.setId(id);
+                        encounter.setUuid(uuid);
+                        encounter.setDisplay(display);
+                        encounter.setEncounterDatetime(DateUtils.convertTime(datetime, DateUtils.OPEN_MRS_REQUEST_FORMAT));
+                        encounter.setEncounterType((EncounterType) new Select().from(EncounterType.class).where("display = ?", EncounterType.VITALS).executeSingle());
+                        encounter.setObservations(new ObservationDAO().findObservationByEncounterID(id));
+                        encounter.setForm(FormService.getFormByUuid(formUuid));
+                        encounter.setPatient(new PatientDAO().findPatientByUUID(patientUuid));
+                    }
+                } finally {
+                    cursor.close();
+                }
+            }
+            return encounter;
+        }
+
+
+
 }

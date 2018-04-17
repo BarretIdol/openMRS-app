@@ -234,6 +234,7 @@ public class AddEditPatientPresenter extends BasePresenter implements AddEditPat
 
     private void fetchSimilarPatientAndCalculateLocally(final Patient patient) {
         Call<Results<Patient>> call = restApi.getPatients(patient.getPerson().getName().getGivenName(), ApplicationConstants.API.FULL);
+       // Call<Results<Patient>> call = restApi.getPatientsByCity("true","aa", ApplicationConstants.API.FULL);
         call.enqueue(new Callback<Results<Patient>>() {
             @Override
             public void onResponse(Call<Results<Patient>> call, Response<Results<Patient>> response) {

@@ -15,6 +15,7 @@
 package org.openmrs.mobile.activities.patientdashboard;
 
 import org.openmrs.mobile.activities.BasePresenter;
+import org.openmrs.mobile.dao.EncounterDAO;
 import org.openmrs.mobile.dao.PatientDAO;
 import org.openmrs.mobile.dao.VisitDAO;
 import org.openmrs.mobile.models.Patient;
@@ -26,9 +27,9 @@ public abstract class PatientDashboardMainPresenterImpl extends BasePresenter im
     protected Patient mPatient;
 
     @Override
-    public void deletePatient() {
+    public void deletePatient() { //cambiar a delete Encounters
         new PatientDAO().deletePatient(mPatient.getId());
-        addSubscription(new VisitDAO().deleteVisitsByPatientId(mPatient.getId())
+        addSubscription(new EncounterDAO().deleteEncounterByPatientUUID(mPatient.getUuid())
                 .observeOn(Schedulers.io())
                 .subscribe());
     }

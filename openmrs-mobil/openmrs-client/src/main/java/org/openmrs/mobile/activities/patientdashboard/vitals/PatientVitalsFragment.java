@@ -33,8 +33,10 @@ import org.openmrs.mobile.activities.patientdashboard.PatientDashboardFragment;
 import org.openmrs.mobile.application.OpenMRSInflater;
 import org.openmrs.mobile.bundle.FormFieldsWrapper;
 import org.openmrs.mobile.models.Encounter;
+import org.openmrs.mobile.models.EncounterMethods;
 import org.openmrs.mobile.models.Form;
 import org.openmrs.mobile.models.Observation;
+import org.openmrs.mobile.models.ObservationMethods;
 import org.openmrs.mobile.utilities.ApplicationConstants;
 import org.openmrs.mobile.utilities.DateUtils;
 import org.openmrs.mobile.utilities.FontsUtil;
@@ -46,7 +48,7 @@ public class PatientVitalsFragment extends PatientDashboardFragment implements P
     private LinearLayout mFormHeader;
     private TextView mEmptyList;
     private TextView mLastVitalsDate;
-
+    private TextView mLabel;
     private LayoutInflater mInflater;
 
     @Override
@@ -64,8 +66,7 @@ public class PatientVitalsFragment extends PatientDashboardFragment implements P
         mEmptyList = (TextView) root.findViewById(R.id.lastVitalsNoneLabel);
         mLastVitalsDate = (TextView) root.findViewById(R.id.lastVitalsDate);
         mFormHeader = (LinearLayout) root.findViewById(R.id.lastVitalsLayout);
-
-        TextView lastVitalsLabel = (TextView) root.findViewById(R.id.lastVitalsLabel);
+        mLabel = (TextView) root.findViewById(R.id.lastVitalsLabel);
         ImageButton formEditIcon = (ImageButton) root.findViewById(R.id.form_edit_icon);
 
         formEditIcon.setOnClickListener(new View.OnClickListener() {
@@ -78,7 +79,7 @@ public class PatientVitalsFragment extends PatientDashboardFragment implements P
         this.mInflater = inflater;
 
         FontsUtil.setFont(mEmptyList, FontsUtil.OpenFonts.OPEN_SANS_EXTRA_BOLD);
-        FontsUtil.setFont(lastVitalsLabel, FontsUtil.OpenFonts.OPEN_SANS_EXTRA_BOLD);
+        FontsUtil.setFont(mLabel, FontsUtil.OpenFonts.OPEN_SANS_EXTRA_BOLD);
         FontsUtil.setFont(mLastVitalsDate, FontsUtil.OpenFonts.OPEN_SANS_SEMIBOLD);
 
         return root;
@@ -98,14 +99,26 @@ public class PatientVitalsFragment extends PatientDashboardFragment implements P
     }
 
     @Override
+    public void showEncounterVitals(EncounterMethods encounter) {
+        mLastVitalsDate.setText(DateUtils.convertTime(encounter.getEncounterDatetime(), DateUtils.DATE_WITH_TIME_FORMAT));
+        mLabel.setText(encounter.getFormName());
+        OpenMRSInflater openMRSInflater = new OpenMRSInflater(mInflater);
+        mContent.removeAllViews();
+        for (ObservationMethods obs : encounter.getObservationsMethods()) {
+            openMRSInflater.addKeyValueStringView(mContent, obs.getDisplay(), obs.getDisplayValue());
+        }
+    }
+
+    /*@Override
     public void showEncounterVitals(Encounter encounter) {
         mLastVitalsDate.setText(DateUtils.convertTime(encounter.getEncounterDatetime(), DateUtils.DATE_WITH_TIME_FORMAT));
+        mLabel.setText(encounter.getDisplay());
         OpenMRSInflater openMRSInflater = new OpenMRSInflater(mInflater);
         mContent.removeAllViews();
         for (Observation obs : encounter.getObservations()) {
             openMRSInflater.addKeyValueStringView(mContent, obs.getDisplay(), obs.getDisplayValue());
         }
-    }
+    }*/
 
     @Override
     public void startFormDisplayActivity(Encounter encounter) {
@@ -116,6 +129,7 @@ public class PatientVitalsFragment extends PatientDashboardFragment implements P
             intent.putExtra(ApplicationConstants.BundleKeys.PATIENT_ID_BUNDLE, encounter.getPatient().getId());
             intent.putExtra(ApplicationConstants.BundleKeys.VALUEREFERENCE, form.getValueReference());
             intent.putExtra(ApplicationConstants.BundleKeys.ENCOUNTERTYPE, encounter.getEncounterType().getUuid());
+            intent.putExtra(ApplicationConstants.BundleKeys.ENCOUNTER_SYNC, false);
             intent.putParcelableArrayListExtra(ApplicationConstants.BundleKeys.FORM_FIELDS_LIST_BUNDLE, FormFieldsWrapper.create(encounter));
             startActivity(intent);
         } else {

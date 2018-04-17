@@ -23,7 +23,7 @@ public class InputField implements Serializable, Parcelable {
 
     private int id;
     private String concept;
-    private double value = -1.0;
+    private String value = "";
     private boolean isRed = false;
 
 
@@ -48,11 +48,11 @@ public class InputField implements Serializable, Parcelable {
         return concept;
     }
 
-    public void setValue(Double value) {
+    public void setValue(String value) {
         this.value = value;
     }
 
-    public Double getValue() {
+    public String getValue() {
         return value;
     }
 
@@ -73,14 +73,14 @@ public class InputField implements Serializable, Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(this.id);
         dest.writeString(this.concept);
-        dest.writeDouble(this.value);
+        dest.writeString(this.value);
         dest.writeInt(this.isRed?1:0);
     }
 
     protected InputField(Parcel in) {
         this.id = in.readInt();
         this.concept = in.readString();
-        this.value = in.readDouble();
+        this.value = in.readString();
         this.isRed = (in.readInt()==1);
     }
 

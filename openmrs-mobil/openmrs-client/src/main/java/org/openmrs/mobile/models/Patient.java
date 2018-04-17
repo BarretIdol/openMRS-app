@@ -152,15 +152,30 @@ public class Patient extends Resource implements Serializable{
             if (encounters.contains(",")) {
                 String [] enc = encounters.split(",");
                 for (String s: enc) {
-                    ret.add(new Encountercreate().load(Encountercreate.class,Long.parseLong(s)));
+                    Encountercreate e = new Encountercreate().load(Encountercreate.class,Long.parseLong(s));
+                    if (!e.getSynced())
+                        ret.add(e);
 
                 }
             }
             else {
-                ret.add(new Encountercreate().load(Encountercreate.class,Long.parseLong(encounters)));
+                Encountercreate e = new Encountercreate().load(Encountercreate.class,Long.parseLong(encounters));
+                if (!e.getSynced())
+                    ret.add(new Encountercreate().load(Encountercreate.class,Long.parseLong(encounters)));
             }
         }
         return ret;
+    }
+
+    @Override
+    public boolean equals(Object obj) { // added by hector, so removeAll from list works
+        if (obj == null) { return false; }
+        else if (getClass() != obj.getClass()) { return false; }
+        //else if (! super.equals(obj)) return false;
+        else {
+            Patient object = (Patient) obj;
+            return object.getDisplay().equals(this.display); //could also work with Uuid
+        }
     }
 
     public void addEncounters(Long encid)

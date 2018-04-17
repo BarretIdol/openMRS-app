@@ -16,6 +16,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -57,9 +58,11 @@ import org.openmrs.mobile.bundle.FormFieldsWrapper;
 import org.openmrs.mobile.models.Answer;
 import org.openmrs.mobile.models.Question;
 import org.openmrs.mobile.utilities.ApplicationConstants;
+import org.openmrs.mobile.utilities.Gps;
 import org.openmrs.mobile.utilities.InputField;
 import org.openmrs.mobile.utilities.RangeEditText;
 import org.openmrs.mobile.utilities.SelectOneField;
+import org.openmrs.mobile.utilities.StringUtils;
 import org.openmrs.mobile.utilities.ToastUtil;
 
 import java.util.ArrayList;
@@ -67,7 +70,7 @@ import java.util.List;
 
 public class FormDisplayPageFragment extends ACBaseFragment<FormDisplayContract.Presenter.PagePresenter> implements FormDisplayContract.View.PageView{
 
-    public static final String CONCEPT_BMI_UUID = "cfdcd2e9-79d5-4980-b0e2-d2983b9350fb";
+    public static final String CONCEPT_BMI_UUID = ApplicationConstants.ConceptUuids.BMI ;
     private List<InputField> inputFields = new ArrayList<>();
     private List<SelectOneField> selectOneFields = new ArrayList<>();
     private LinearLayout mParent;
@@ -81,6 +84,7 @@ public class FormDisplayPageFragment extends ACBaseFragment<FormDisplayContract.
     private TextView mTxtView;
     private ArrayList<Integer> mListSystolic,mListDiastolic,mListPulse;
     int mDiastolic,mSystolic, mPulse;
+    private Context mContext;
 
     public static FormDisplayPageFragment newInstance() {
         return new FormDisplayPageFragment();
@@ -97,6 +101,7 @@ public class FormDisplayPageFragment extends ACBaseFragment<FormDisplayContract.
         mListDiastolic=new ArrayList<Integer>();
         mListSystolic=new ArrayList<Integer>();
         mListPulse=new ArrayList<Integer>();
+        mContext = super.getContext();
         return root;
     }
 
@@ -389,6 +394,31 @@ public class FormDisplayPageFragment extends ACBaseFragment<FormDisplayContract.
 
     }
 
+    @Override
+    public void createAndAttachTextQuestionEditText(Question question, LinearLayout sectionLinearLayout) {
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+
+        RangeEditText ed = new RangeEditText(getActivity());
+        InputField field = new InputField(question.getQuestionOptions().getConcept());
+        InputField inputField = getInputField(field.getConcept());
+        if (inputField != null) {
+            inputField.setId(field.getId());
+        } else {
+            field.setConcept(question.getQuestionOptions().getConcept());
+            inputFields.add(field);
+        }
+        ed.setName(question.getLabel());
+        ed.setSingleLine(true);
+        ed.setHint(question.getLabel());
+        ed.setLowerlimit(-1.0);
+        ed.setUpperlimit(-1.0);
+        ed.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+        ed.setInputType(InputType.TYPE_CLASS_TEXT);
+        ed.setId(field.getId());
+        sectionLinearLayout.addView(ed, layoutParams);
+    }
+
     private TextView generateTextView(String text) {
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -579,26 +609,28 @@ public class FormDisplayPageFragment extends ACBaseFragment<FormDisplayContract.
     @Override
     public List<InputField> getInputFields() {
         for (InputField field : inputFields) {
-            if (field.getConcept().equalsIgnoreCase(CONCEPT_BMI_UUID)) {
-                Double pes = inputFields.get(3).getValue();
-                Double altura = inputFields.get(4).getValue();
-                Double bmi = pes * 100 * 100 / (altura * altura);
+            String pes = inputFields.get(3).getValue();
+            String altura = inputFields.get(4).getValue();
+            if (field.getConcept().equalsIgnoreCase(CONCEPT_BMI_UUID) && StringUtils.notEmpty(pes) && StringUtils.notEmpty(altura)) {
+                Double pesD = Double.parseDouble(pes);
+                Double alturaD =Double.parseDouble(altura);
+                Double bmi = pesD * 100 * 100 / (alturaD * alturaD);
                 Log.d("checkinputfieled.java", "check BMI:" + bmi.toString());
-                field.setValue(bmi);
+                field.setValue(String.valueOf(bmi));
             } else {
                 try {
                     RangeEditText ed = (RangeEditText) getActivity().findViewById(field.getId());
 
                     if (!isEmpty(ed)) {
-                        field.setValue(Double.parseDouble(ed.getText().toString()));
+                        field.setValue(ed.getText().toString());
                         boolean isRed = (ed.getCurrentTextColor() == ContextCompat.getColor(OpenMRS.getInstance(), R.color.red));
                         field.setIsRed(isRed);
                     } else {
-                        field.setValue(-1.0);
+                        field.setValue("");
                     }
                 } catch (ClassCastException e) {
-                    DiscreteSeekBar dsb = (DiscreteSeekBar) getActivity().findViewById(field.getId());
-                    field.setValue((double) dsb.getProgress());
+                   /* DiscreteSeekBar dsb = (DiscreteSeekBar) getActivity().findViewById(field.getId());
+                    field.setValue((String.valueOf(dsb.getProgress())));*/
                 }
             }
         }
@@ -616,7 +648,7 @@ public class FormDisplayPageFragment extends ACBaseFragment<FormDisplayContract.
         this.selectOneFields = selectOneFields;
     }
 
-    public boolean checkInputFields() {
+    public boolean checkInputFields() { // aqui
         boolean allEmpty = true;
         boolean valid = true;
         int nInputFields = 0;
@@ -628,11 +660,13 @@ public class FormDisplayPageFragment extends ACBaseFragment<FormDisplayContract.
                         nInputFields++;
                         allEmpty = false;
                         if (ed.getText().toString().charAt(0) != '.') {
-                            Double inp = Double.parseDouble(ed.getText().toString());
+                            try {Double inp = Double.parseDouble(ed.getText().toString());
+
                             if (ed.getUpperlimit() != -1.0 && ed.getUpperlimit() != -1.0 && (ed.getUpperlimit() < inp || ed.getLowerlimit() > inp)) {
                                 ed.setTextColor(ContextCompat.getColor(OpenMRS.getInstance(), R.color.red));
                                 valid = false;
-                            }
+                            }}
+                            catch (RuntimeException e) { Log.d("FormDisplayPageFragment","Can't convert to double " + ed.getText().toString()); }
                         } else {
                             ed.setTextColor(ContextCompat.getColor(OpenMRS.getInstance(), R.color.red));
                             valid = false;
@@ -672,25 +706,29 @@ public class FormDisplayPageFragment extends ACBaseFragment<FormDisplayContract.
     private void updateBMI(){
         inputFields=getInputFields();
         for( InputField field:inputFields) {
-            if (field.getConcept().equalsIgnoreCase(CONCEPT_BMI_UUID)) {
-                Double pes = inputFields.get(3).getValue();
-                Double altura = inputFields.get(4).getValue();
-                Double bmi = pes * 100 * 100 / (altura * altura);
+            String pes = inputFields.get(3).getValue();
+            String altura = inputFields.get(4).getValue();
+            if (field.getConcept().equalsIgnoreCase(CONCEPT_BMI_UUID) && StringUtils.notEmpty(pes) && StringUtils.notEmpty(altura)) {
+                Double pesD = Double.parseDouble(inputFields.get(3).getValue());
+                Double alturaD = Double.parseDouble(inputFields.get(4).getValue());
+                Double bmi = pesD * 100 * 100 / (alturaD * alturaD);
                 TextView tv = (TextView) getActivity().findViewById(field.getId());
-                if (pes==-1.0F || altura==-1.0F)
+                if (pesD==-1.0F || alturaD==-1.0F)
                     tv.setText(new String());
                 else {
                     Log.d("checkinputfieled.java", "check BMI:" + bmi.toString());
-                    field.setValue(bmi);
-                    int aux = (int) (field.getValue().floatValue() * 100);
+                    field.setValue(String.valueOf(bmi));
+                    int aux = (int) (Float.parseFloat(field.getValue()) * 100);
                     Float valor = aux / 100.f;
                     tv.setText(valor.toString());
-                    if (valor < 25)
-                        tv.setTextColor(Color.GREEN);
-                    else if (valor > 30)
+                    if (valor >40 || valor<20)
                         tv.setTextColor(Color.RED);
+                    else if (valor > 30)
+                        tv.setTextColor(Color.rgb(255,165,0));
+                    else if (valor>25)
+                        tv.setTextColor(Color.rgb(255,220,0));
                     else
-                        tv.setTextColor(Color.rgb(255, 127, 0));
+                        tv.setTextColor(Color.GREEN);
                 }
             }
         }

@@ -82,6 +82,9 @@ public interface RestApi {
     Call<Results<Patient>> getPatients(@Query("q") String searchQuery,
                                        @Query("v") String representation);
 
+    @GET("patient?matchSimilar=true&v=full")
+    Call<Results<Patient>> getPatientsByCity(@Query("city") String city);
+
     @POST("personimage/{uuid}")
     Call<PatientPhoto> uploadPatientPhoto(@Path("uuid") String uuid,
                                           @Body PatientPhoto patientPhoto);

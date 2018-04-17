@@ -85,6 +85,9 @@ public class FormDisplayPagePresenter extends BasePresenter implements FormDispl
         if (question.getQuestionOptions().getRendering().equals("radio")) {
             mFormDisplayPageView.createAndAttachSelectQuestionRadioButton(question, sectionLinearLayout);
         }
+        if (question.getQuestionOptions().getRendering().equals("text")) {
+            mFormDisplayPageView.createAndAttachTextQuestionEditText(question, sectionLinearLayout);
+        }
     }
 
 }

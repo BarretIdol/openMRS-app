@@ -34,6 +34,7 @@ public interface FormDisplayContract {
             void attachSectionToView(LinearLayout linearLayout);
             void attachQuestionToSection(LinearLayout section, LinearLayout question);
             void createAndAttachNumericQuestionEditText(Question question, LinearLayout sectionLinearLayout);
+            void createAndAttachTextQuestionEditText(Question question, LinearLayout sectionLinearLayout);
             void createAndAttachSelectQuestionDropdown(Question question, LinearLayout sectionLinearLayout);
             void createAndAttachSelectQuestionRadioButton(Question question, LinearLayout sectionLinearLayout);
             LinearLayout createQuestionGroupLayout(String questionLabel);

@@ -123,11 +123,28 @@ public class LastViewedPatientsPresenter extends BasePresenter implements LastVi
         setViewBeforePatientDownload();
         lastQuery = query;
         Call<Results<Patient>> call = restApi.getPatients(query, ApplicationConstants.API.FULL);
+        Call<Results<Patient>> call2 = restApi.getPatientsByCity(query);
         call.enqueue(new Callback<Results<Patient>>() {
             @Override
             public void onResponse(Call<Results<Patient>> call, Response<Results<Patient>> response) {
                 if (response.isSuccessful()) {
                     mLastViewedPatientsView.updateList(filterNotDownloadedPatients(response.body().getResults()));
+                    setViewAfterPatientDownloadSuccess();
+                }
+                else {
+                    setViewAfterPatientDownloadError(response.message());
+                }
+            }
+            @Override
+            public void onFailure(Call<Results<Patient>> call, Throwable t) {
+                setViewAfterPatientDownloadError(t.getMessage());
+            }
+        });
+        call2.enqueue(new Callback<Results<Patient>>() {
+            @Override
+            public void onResponse(Call<Results<Patient>> call, Response<Results<Patient>> response) {
+                if (response.isSuccessful()) {
+                    mLastViewedPatientsView.addPatientsToList(filterNotDownloadedPatients(response.body().getResults()));
                     setViewAfterPatientDownloadSuccess();
                 }
                 else {

@@ -75,7 +75,7 @@ public class PatientDashboardVisitsPresenter extends PatientDashboardMainPresent
         visitDAO.findEncountersByPatientUuid(mPatient.getUuid())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(patientVisits -> {
-                    if (patientVisits !=null && patientVisits.isEmpty()) {
+                    if (patientVisits !=null && patientVisits.isEmpty() && mPatient.getEncountercreates().isEmpty()) {
                         mPatientVisitsView.toggleRecyclerListVisibility(false);
                     }
                     else {

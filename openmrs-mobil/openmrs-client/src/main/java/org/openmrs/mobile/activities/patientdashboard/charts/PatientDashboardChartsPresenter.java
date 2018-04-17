@@ -16,6 +16,7 @@ package org.openmrs.mobile.activities.patientdashboard.charts;
 
 import org.openmrs.mobile.activities.patientdashboard.PatientDashboardContract;
 import org.openmrs.mobile.activities.patientdashboard.PatientDashboardMainPresenterImpl;
+import org.openmrs.mobile.dao.EncounterDAO;
 import org.openmrs.mobile.dao.PatientDAO;
 import org.openmrs.mobile.dao.VisitDAO;
 
@@ -24,21 +25,21 @@ import rx.android.schedulers.AndroidSchedulers;
 public class PatientDashboardChartsPresenter extends PatientDashboardMainPresenterImpl implements PatientDashboardContract.PatientChartsPresenter {
 
     private PatientDashboardContract.ViewPatientCharts mPatientChartsView;
-    private VisitDAO visitDAO;
+    private EncounterDAO encounterDAO;
 
     public PatientDashboardChartsPresenter(String id, PatientDashboardContract.ViewPatientCharts mPatientChartsView) {
         this.mPatientChartsView = mPatientChartsView;
         this.mPatient = new PatientDAO().findPatientByID(id);
-        this.visitDAO = new VisitDAO();
+        this.encounterDAO = new EncounterDAO();
         mPatientChartsView.setPresenter(this);
     }
 
     @Override
     public void subscribe() {
-        addSubscription(visitDAO.getVisitsByPatientID(mPatient.getId())
+        addSubscription(encounterDAO.findEncountersByPatientUuid(mPatient.getUuid())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(visits -> {
-                            mPatientChartsView.populateList(visits);
+                .subscribe(encounters -> {
+                            mPatientChartsView.populateList(encounters);
                         }
                 ));
 

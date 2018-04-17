@@ -65,10 +65,11 @@ public class VisitExpandableListAdapter extends BaseExpandableListAdapter {
             Log.d("VisitiExpandable.java", "encounter type"+encounter.getEncounterType().getDisplay());
             switch (encounter.getEncounterType().getDisplay()) {
                 case EncounterType.VITALS:
-                case EncounterType.VITALS_PRES:
+                case EncounterType.VITALSBPUP:
                 case EncounterType.PHARMACOLOGICAL:
-                case EncounterType.NON_PHARMACOLOGICAL:
+                case EncounterType.RISK_FACTORS:
                 case EncounterType.TEST_ADHERENCE:
+                case EncounterType.MED_BACKGROUND:
                 case EncounterType.PERSONAL_DATA:
 
                     for (Observation obs : encounter.getObservations()) {

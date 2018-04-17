@@ -18,6 +18,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.WindowManager;
@@ -32,6 +33,7 @@ import org.openmrs.mobile.models.Form;
 import org.openmrs.mobile.models.Page;
 import org.openmrs.mobile.utilities.ApplicationConstants;
 import org.openmrs.mobile.utilities.FormService;
+import org.openmrs.mobile.utilities.Gps;
 import org.openmrs.mobile.utilities.ToastUtil;
 
 import java.util.ArrayList;
@@ -43,6 +45,7 @@ public class FormDisplayActivity extends ACBaseActivity implements FormDisplayCo
     private Button mBtnNext, mBtnFinish;
     private int mDotsCount;
     private ImageView[] mDots;
+
 
     private FormDisplayContract.Presenter.MainPresenter mPresenter;
 
@@ -66,7 +69,8 @@ public class FormDisplayActivity extends ACBaseActivity implements FormDisplayCo
             getSupportActionBar().setTitle(formName + " Form");
         }
 
-        initViewComponents(valuereference);
+
+            initViewComponents(valuereference);
     }
 
     @Override

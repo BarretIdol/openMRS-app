@@ -53,7 +53,7 @@ public class FormListPresenter extends BasePresenter implements FormListContract
         loadFormResourceList();
     }
 
-    private static String[] loadableEncountersList={EncounterType.VITALSBPUP};
+    private static String[] loadableEncountersList={EncounterType.VITALSBPUP,EncounterType.TEST_ADHERENCE,EncounterType.PERSONAL_DATA,EncounterType.RISK_FACTORS,EncounterType.MED_BACKGROUND};
     private boolean isLoadableFormResourceName(String resourceName){
         for (int i=0;i<loadableEncountersList.length;i++)
             if(resourceName.contentEquals(loadableEncountersList[i]))

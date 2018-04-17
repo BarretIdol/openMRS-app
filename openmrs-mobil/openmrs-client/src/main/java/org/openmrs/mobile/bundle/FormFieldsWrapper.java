@@ -17,9 +17,13 @@ package org.openmrs.mobile.bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+
+
 import org.openmrs.mobile.models.Answer;
 import org.openmrs.mobile.models.Encounter;
+import org.openmrs.mobile.models.EncounterMethods;
 import org.openmrs.mobile.models.Observation;
+import org.openmrs.mobile.models.ObservationMethods;
 import org.openmrs.mobile.models.Page;
 import org.openmrs.mobile.models.Question;
 import org.openmrs.mobile.models.Section;
@@ -60,6 +64,53 @@ public class FormFieldsWrapper implements Serializable, Parcelable {
     }
 
 
+ /*   public static ArrayList<FormFieldsWrapper> create(EncounterMethods encounter){
+        ArrayList<FormFieldsWrapper> formFieldsWrapperList = new ArrayList<>();
+
+        List<Page> pages = encounter.getForm().getPages();
+        for (Page page : pages) {
+            FormFieldsWrapper formFieldsWrapper = new FormFieldsWrapper();
+            List<InputField> inputFieldList = new LinkedList<>();
+            List<SelectOneField> selectOneFieldList = new LinkedList<>();
+            List<Section> sections = page.getSections();
+            for (Section section : sections) {
+                List<Question> questions = section.getQuestions();
+                for (Question questionGroup : questions) {
+                    for (Question question : questionGroup.getQuestions()) {
+                        if(question.getQuestionOptions().getRendering().equals("number") || question.getQuestionOptions().getRendering().equals("text")) {
+                            String conceptUuid = question.getQuestionOptions().getConcept();
+                            InputField inputField = new InputField(conceptUuid);
+                            inputField.setValue(getValue(encounter.getObservationsMethods(), conceptUuid));
+                            inputFieldList.add(inputField);
+                        } else if (question.getQuestionOptions().getRendering().equals("select") || question.getQuestionOptions().getRendering().equals("radio")) {
+                            String conceptUuid = question.getQuestionOptions().getConcept();
+                            SelectOneField selectOneField =
+                                    new SelectOneField(question.getQuestionOptions().getAnswers(), conceptUuid);
+                            Answer chosenAnswer = new Answer();
+                            chosenAnswer.setConcept(conceptUuid);
+                            chosenAnswer.setLabel(getValue(encounter.getObservationsMethods(), conceptUuid).toString());
+                            selectOneField.setChosenAnswer(chosenAnswer);
+                            selectOneFieldList.add(selectOneField);
+                        }
+                    }
+                }
+            }
+            formFieldsWrapper.setSelectOneFields(selectOneFieldList);
+            formFieldsWrapper.setInputFields(inputFieldList);
+            formFieldsWrapperList.add(formFieldsWrapper);
+        }
+        return formFieldsWrapperList;
+    }
+
+    private static String getValue(List<ObservationMethods> observations, String conceptUuid) {
+        for (ObservationMethods observation : observations) {
+            if(observation.getConceptUuid().equals(conceptUuid)){
+                return observation.getDisplayValue();
+            }
+        }
+        return "";
+    }*/
+
     public static ArrayList<FormFieldsWrapper> create(Encounter encounter){
         ArrayList<FormFieldsWrapper> formFieldsWrapperList = new ArrayList<>();
 
@@ -73,7 +124,7 @@ public class FormFieldsWrapper implements Serializable, Parcelable {
                 List<Question> questions = section.getQuestions();
                 for (Question questionGroup : questions) {
                     for (Question question : questionGroup.getQuestions()) {
-                        if(question.getQuestionOptions().getRendering().equals("number")) {
+                        if(question.getQuestionOptions().getRendering().equals("number") || question.getQuestionOptions().getRendering().equals("text")) {
                             String conceptUuid = question.getQuestionOptions().getConcept();
                             InputField inputField = new InputField(conceptUuid);
                             inputField.setValue(getValue(encounter.getObservations(), conceptUuid));
@@ -98,15 +149,14 @@ public class FormFieldsWrapper implements Serializable, Parcelable {
         return formFieldsWrapperList;
     }
 
-    private static Double getValue(List<Observation> observations, String conceptUuid) {
+    private static String getValue(List<Observation> observations, String conceptUuid) {
         for (Observation observation : observations) {
             if(observation.getConcept().getUuid().equals(conceptUuid)){
-                return Double.valueOf(observation.getDisplayValue());
+                return observation.getDisplayValue();
             }
         }
-        return -1.0;
+        return "";
     }
-
     @Override
     public int describeContents() {
         return 0;

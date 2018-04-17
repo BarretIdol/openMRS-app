@@ -34,7 +34,8 @@
     <uses-feature
         android:name="android.hardware.camera.autofocus"
         android:required="false" />
-
+    <!-- Needed only if your app targets Android 5.0 (API level 21) or higher. -->
+    <!--<uses-feature android:name="android.hardware.location.gps" /> -->
     <application
         android:name=".application.OpenMRS"
         android:allowBackup="false"

@@ -30,13 +30,18 @@ import org.json.JSONObject;
 import org.openmrs.mobile.R;
 import org.openmrs.mobile.activities.patientdashboard.PatientDashboardContract;
 import org.openmrs.mobile.activities.patientdashboard.PatientDashboardFragment;
+import org.openmrs.mobile.dao.PatientDAO;
 import org.openmrs.mobile.models.Encounter;
+import org.openmrs.mobile.models.EncounterMethods;
 import org.openmrs.mobile.models.EncounterType;
 import org.openmrs.mobile.models.Observation;
+import org.openmrs.mobile.models.ObservationMethods;
 import org.openmrs.mobile.models.Visit;
 import org.openmrs.mobile.utilities.ApplicationConstants;
+import org.openmrs.mobile.utilities.DateUtils;
 import org.openmrs.mobile.utilities.FontsUtil;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -86,46 +91,62 @@ public class PatientChartsFragment extends PatientDashboardFragment implements P
     }
 
     @Override
-    public void populateList(List<Visit> visits) {
+    public void populateList(List<Encounter> encounters) {
+        // passar amb EncounterMethods i ObservableMethods
         //final String[] displayableEncounterTypes = ApplicationConstants.EncounterTypes.ENCOUNTER_TYPES_DISPLAYS;
-        final String[] displayableEncounterTypes = {EncounterType.VITALS};
+        final String[] displayableEncounterTypes = {EncounterType.VITALSBPUP};
         final HashSet<String> displayableEncounterTypesArray = new HashSet<>(Arrays.asList(displayableEncounterTypes));
         JSONObject observationList = new JSONObject();
-
-        for (Visit visit : visits) {
-            List<Encounter> encounters = visit.getEncounters();
+        List <EncounterMethods> encounterMethods = new ArrayList<EncounterMethods>();
+        encounterMethods.addAll(encounters);
+        encounterMethods.addAll(new PatientDAO().findPatientByID(String.valueOf(mPresenter.getPatientId())).getEncountercreates());
+        /*for (Encounter visit : visits) {
+            //List<Encounter> encounters = visit.getEncounters();
             if (!encounters.isEmpty()) {
-                setEmptyListVisibility(false);
-                for (Encounter encounter : encounters) {
-                    String datetime = encounter.getEncounterDate();
-                    String encounterTypeDisplay = encounter.getEncounterType().getDisplay();
+                setEmptyListVisibility(false);*/
+                for (EncounterMethods encounter : encounterMethods) {
+                    String datetime = DateUtils.convertTime(encounter.getEncounterDatetime());
+                    String encounterTypeDisplay = encounter.getFormName();
                     if (displayableEncounterTypesArray.contains(encounterTypeDisplay)) {
-                        for (Observation obs : encounter.getObservations()) {
-                            String observationLabel = obs.getDisplay();
-                            if (observationLabel.contains(":")) {
-                                observationLabel = observationLabel.substring(0, observationLabel.indexOf(':'));
-                            }
-                            if (observationList.has(observationLabel)) {
-                                JSONObject chartData = null;
-                                try {
-                                    chartData = observationList.getJSONObject(observationLabel);
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
+                        for (ObservationMethods obs : encounter.getObservationsMethods()) {
+                            if (obs.getConceptUuid().equals(ApplicationConstants.ConceptUuids.BMI) || obs.getConceptUuid().equals(ApplicationConstants.ConceptUuids.DIASTOLIC)
+                                    || obs.getConceptUuid().equals(ApplicationConstants.ConceptUuids.SYSTOLIC) || obs.getConceptUuid().equals(ApplicationConstants.ConceptUuids.PULSE)) {
+                                String observationLabel = obs.getDisplay();
+                                if (observationLabel.contains(":")) {
+                                    observationLabel = observationLabel.substring(0, observationLabel.indexOf(':'));
                                 }
-                                if (chartData.has(datetime)) {
-                                    JSONArray obsValue = null;
+                                if (observationList.has(observationLabel)) {
+                                    JSONObject chartData = null;
                                     try {
-                                        obsValue = chartData.getJSONArray(datetime);
+                                        chartData = observationList.getJSONObject(observationLabel);
                                     } catch (JSONException e) {
                                         e.printStackTrace();
                                     }
-                                    obsValue.put(obs.getDisplayValue());
-                                    try {
-                                        chartData.put(datetime, obsValue);
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
+                                    if (chartData.has(datetime)) {
+                                        JSONArray obsValue = null;
+                                        try {
+                                            obsValue = chartData.getJSONArray(datetime);
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+                                        obsValue.put(obs.getDisplayValue());
+                                        try {
+                                            chartData.put(datetime, obsValue);
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+                                    } else {
+                                        JSONArray obsValue = new JSONArray();
+                                        obsValue.put(obs.getDisplayValue());
+                                        try {
+                                            chartData.put(datetime, obsValue);
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
                                     }
+
                                 } else {
+                                    JSONObject chartData = new JSONObject();
                                     JSONArray obsValue = new JSONArray();
                                     obsValue.put(obs.getDisplayValue());
                                     try {
@@ -133,34 +154,24 @@ public class PatientChartsFragment extends PatientDashboardFragment implements P
                                     } catch (JSONException e) {
                                         e.printStackTrace();
                                     }
-                                }
+                                    try {
+                                        observationList.put(observationLabel, chartData);
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
 
-                            } else {
-                                JSONObject chartData = new JSONObject();
-                                JSONArray obsValue = new JSONArray();
-                                obsValue.put(obs.getDisplayValue());
-                                try {
-                                    chartData.put(datetime, obsValue);
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
                                 }
-                                try {
-                                    observationList.put(observationLabel, chartData);
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-
                             }
                         }
                     }
                 }
-            }
+           // }
 
 
             VitalsListAdapter vitalsListAdapter = new VitalsListAdapter(this.getActivity(), observationList);
             mExpandableListView.setAdapter(vitalsListAdapter);
             mExpandableListView.setGroupIndicator(null);
-        }
+        //}
 
 
     }

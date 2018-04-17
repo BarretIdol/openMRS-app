@@ -15,10 +15,13 @@ import com.activeandroid.annotation.Table;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import org.openmrs.mobile.dao.ConceptDAO;
+import org.openmrs.mobile.utilities.DateUtils;
+
 import java.io.Serializable;
 
 @Table(name = "obscreate")
-public class Obscreate extends Model implements Serializable {
+public class Obscreate extends Model implements Serializable,ObservationMethods {
 
     @SerializedName("person")
     @Expose
@@ -76,4 +79,25 @@ public class Obscreate extends Model implements Serializable {
         this.value = value;
     }
 
+    @Override
+    public String getConceptUuid() {
+        return concept;
+    }
+
+    @Override
+    public String getDisplayValue() {
+        Concept c = new ConceptDAO().findConceptsByUUID(value);
+        if (c != null) return c.getDisplay();
+        else
+        return value;
+    }
+    @Override
+    public String getDisplay() {
+        return new ConceptDAO().findConceptsByUUID(concept).getDisplay();
+    }
+
+    @Override
+    public Long getObservationDateTime() {
+        return DateUtils.convertTime(obsDatetime,DateUtils.DATE_WITH_TIME_FORMAT);
+    }
 }

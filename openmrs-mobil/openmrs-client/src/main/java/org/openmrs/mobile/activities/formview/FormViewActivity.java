@@ -8,6 +8,7 @@ import org.openmrs.mobile.R;
 import org.openmrs.mobile.activities.ACBaseActivity;
 import org.openmrs.mobile.dao.EncounterDAO;
 import org.openmrs.mobile.dao.ObservationDAO;
+import org.openmrs.mobile.models.Encountercreate;
 import org.openmrs.mobile.utilities.ApplicationConstants;
 
 /**
@@ -18,6 +19,7 @@ public class FormViewActivity extends ACBaseActivity {
 
     RecyclerView recycler;
     long encID;
+    Boolean sync;
 
 
     @Override
@@ -30,7 +32,16 @@ public class FormViewActivity extends ACBaseActivity {
         ObservationDAO observationDAO = new ObservationDAO();
         Bundle bundle = getIntent().getExtras();
         encID = bundle.getLong(ApplicationConstants.BundleKeys.ENCOUNTER_ID);
-        EncounterAdapter adapter = new EncounterAdapter(observationDAO.findObservationByEncounterID(encID));
+        sync = bundle.getBoolean(ApplicationConstants.BundleKeys.ENCOUNTER_SYNC);
+        EncounterAdapter adapter;
+        if (sync)
+            adapter = new EncounterAdapter(observationDAO.findObservationByEncounterID(encID),null);
+        else {
+            Encountercreate encounter = new Encountercreate().load(Encountercreate.class, encID);
+            encounter.pullObslist();
+            adapter = new EncounterAdapter(null,encounter.getObservations());
+        }
+
         recycler.setAdapter(adapter);
     }
 }

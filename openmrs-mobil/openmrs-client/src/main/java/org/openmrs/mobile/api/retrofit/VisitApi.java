@@ -158,6 +158,64 @@ public class VisitApi {
                 }
             }
         });
+        Call<Results<Encounter>> call2 = restApi.getLastVitals(patientUuid, ApplicationConstants.EncounterTypes.PERSONAL_DATA, "full", 1,"desc"); // changed by hector
+        call2.enqueue(new Callback<Results<Encounter>>() {
+            @Override
+            public void onResponse(Call<Results<Encounter>> call, Response<Results<Encounter>> response) {
+                if (response.isSuccessful()) {
+                    if (!response.body().getResults().isEmpty()) {
+                        for (Encounter e : response.body().getResults()) {
+                            //encounterDAO.saveLastVitalsEncounter(e, patientUuid);
+                            encounterDAO.syncBPUPEncounters(e,patientUuid); // changed by hector
+                        }
+                    }
+                    if (callbackListener != null) {
+                        callbackListener.onResponse();
+                    }
+                }
+                else {
+                    if (callbackListener != null) {
+                        callbackListener.onErrorResponse(response.message());
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Results<Encounter>> call, Throwable t) {
+                if (callbackListener != null) {
+                    callbackListener.onErrorResponse(t.getMessage());
+                }
+            }
+        });
+        Call<Results<Encounter>> call3 = restApi.getLastVitals(patientUuid, ApplicationConstants.EncounterTypes.RISK_FACTORS, "full", 1,"desc"); // changed by hector
+        call3.enqueue(new Callback<Results<Encounter>>() {
+            @Override
+            public void onResponse(Call<Results<Encounter>> call, Response<Results<Encounter>> response) {
+                if (response.isSuccessful()) {
+                    if (!response.body().getResults().isEmpty()) {
+                        for (Encounter e : response.body().getResults()) {
+                            //encounterDAO.saveLastVitalsEncounter(e, patientUuid);
+                            encounterDAO.syncBPUPEncounters(e,patientUuid); // changed by hector
+                        }
+                    }
+                    if (callbackListener != null) {
+                        callbackListener.onResponse();
+                    }
+                }
+                else {
+                    if (callbackListener != null) {
+                        callbackListener.onErrorResponse(response.message());
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Results<Encounter>> call, Throwable t) {
+                if (callbackListener != null) {
+                    callbackListener.onErrorResponse(t.getMessage());
+                }
+            }
+        });
     }
 
 

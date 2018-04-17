@@ -376,6 +376,7 @@ class LastViewedPatientRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                 ToastUtil.error("Failed to fetch patient data");
             }
         });
+        new VisitApi().syncLastVitals(patient.getUuid());
     }
 
     public void disableCheckBox(PatientViewHolder holder) {

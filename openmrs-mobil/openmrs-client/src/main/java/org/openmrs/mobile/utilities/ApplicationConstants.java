@@ -75,6 +75,7 @@ public abstract class ApplicationConstants {
         public static final String PATIENT_QUERY_BUNDLE = "patientQuery";
         public static final String PATIENTS_START_INDEX = "patientsStartIndex";
         public static final String ENCOUNTER_ID= "encounter_id";
+        public static final java.lang.String ENCOUNTER_SYNC = "encounter_sync";
     }
 
     public abstract static class ServiceActions {
@@ -95,13 +96,23 @@ public abstract class ApplicationConstants {
         public static final String WS_REST_MAX_RESULTS_ABSOLUTE = "webservices.rest.maxResultsAbsolute";
     }
 
+    public abstract static class ConceptUuids {
+        public static final String BMI = "87b4123c-998a-4306-80dd-60d310b30c62";
+        public static final String PULSE = "5087AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+        public static final String SYSTOLIC = "5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+        public static final String DIASTOLIC = "5086AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+    }
+
     public abstract static class EncounterTypes {
         public static final String VITALS = "67a71486-1a54-468f-ac3e-7091a9a79584";
         public static final String VITALSBPUP = "d9bf9142-f315-4079-9190-bc6f9807d9dd"; // added by hector
+        public static final String PERSONAL_DATA = "abf0c631-a818-412d-af7f-8cc000dddb4e";
+        public static final String MED_BACKGROUND = "8c5674c8-26ed-40ac-9b08-1bc22b823784";
+        public static final String RISK_FACTORS  = " 98ff6a0b-c758-4975-bd38-271cebfc2de9 ";
         //public static final String VITALS = "40fd285b-c6f8-4862-944f-5603645fc749";
 
         public static String[] ENCOUNTER_TYPES_DISPLAYS = {EncounterType.VITALS, EncounterType.ADMISSION,
-                EncounterType.DISCHARGE, EncounterType.VISIT_NOTE, EncounterType.VITALS_PRES, EncounterType.PHARMACOLOGICAL, EncounterType.NON_PHARMACOLOGICAL, EncounterType.TEST_ADHERENCE,EncounterType.PERSONAL_DATA, EncounterType.PRUEBA};
+                EncounterType.DISCHARGE, EncounterType.VISIT_NOTE, EncounterType.VITALS_PRES, EncounterType.PHARMACOLOGICAL, EncounterType.MED_BACKGROUND, EncounterType.TEST_ADHERENCE,EncounterType.PERSONAL_DATA, EncounterType.RISK_FACTORS};
     }
 
 }

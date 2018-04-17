@@ -10,6 +10,8 @@
 
 package org.openmrs.mobile.models;
 
+import android.support.annotation.NonNull;
+
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
@@ -19,13 +21,19 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 
+import org.openmrs.mobile.utilities.DateUtils;
+import org.openmrs.mobile.utilities.FormService;
+
 import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 @Table(name = "encountercreate")
-public class Encountercreate extends Model implements Serializable{
+public class Encountercreate extends Model implements Serializable,EncounterMethods{
 
     private Gson gson=new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
     private Type obscreatetype = new TypeToken<List<Obscreate>>(){}.getType();
@@ -65,8 +73,36 @@ public class Encountercreate extends Model implements Serializable{
     @Column(name = "obs")
     private String obslist;
 
+   /* @Column(name = "encounterDateTime")
+    @Expose
+    private String encounterDateTime;*/
+
     public String getFormUuid() {
         return formUuid;
+    }
+
+    @Override
+    public Form getForm() {
+        return FormService.getFormByUuid(formUuid);
+    }
+
+    @Override
+    public String getDisplay() {
+        return formname + " " + DateUtils.convertTime(getEncounterDatetime(),DateUtils.DATE_WITH_TIME_FORMAT);
+    }
+
+    @Override
+    public String getFormName() {
+        return formname;
+    }
+
+    @Override
+    public Long getEncounterDatetime() {
+        pullObslist();
+        if (observations != null) {
+            return observations.get(0).getObservationDateTime();
+        }
+        return null;
     }
 
     public void setFormUuid(String formUuid) {
@@ -126,6 +162,13 @@ public class Encountercreate extends Model implements Serializable{
         return observations;
     }
 
+    public List<ObservationMethods> getObservationsMethods() {
+        List<ObservationMethods> list = new ArrayList<ObservationMethods>();
+        list.addAll(observations);
+        return list;
+    }
+
+
     public void setObservations(List<Obscreate> observations) {
         this.observations = observations;
     }
@@ -142,6 +185,11 @@ public class Encountercreate extends Model implements Serializable{
         this.observations=obscreateList;
     }
 
+    /*public void setDateTime (String s) { // added by hector
+        encounterDateTime = s;
+    }
 
-
+    public String getDateTime (String s) { // added by hector
+        return this.encounterDateTime;
+    }*/
 }

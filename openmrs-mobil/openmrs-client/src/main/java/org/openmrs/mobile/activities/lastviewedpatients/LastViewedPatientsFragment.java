@@ -186,9 +186,11 @@ public class LastViewedPatientsFragment extends ACBaseFragment<LastViewedPatient
     }
 
     @Override
-    public void addPatientsToList(List<Patient> patients) {
+    public void addPatientsToList(List<Patient> patients) { //modified by hector
+        patients.removeAll(mAdapter.getPatients());
         mAdapter.addPatients(patients);
     }
+
 
     @Override
     public void showRecycleViewProgressBar(boolean visibility) {

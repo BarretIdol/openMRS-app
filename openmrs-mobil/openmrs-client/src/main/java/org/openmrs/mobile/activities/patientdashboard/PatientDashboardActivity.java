@@ -44,6 +44,7 @@ public class PatientDashboardActivity extends ACBaseActivity {
     private String mId;
 
     public PatientDashboardContract.PatientDashboardMainPresenter mPresenter;
+    public PatientDashboardPagerAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +58,8 @@ public class PatientDashboardActivity extends ACBaseActivity {
             patientBundle = getIntent().getExtras();
         }
         mId = String.valueOf(patientBundle.get(ApplicationConstants.BundleKeys.PATIENT_ID_BUNDLE));
-        initViewPager(new PatientDashboardPagerAdapter(getSupportFragmentManager(), mId));
+        mAdapter = new PatientDashboardPagerAdapter(getSupportFragmentManager(), mId);
+        initViewPager(mAdapter);
     }
 
     @Override
@@ -130,7 +132,8 @@ public class PatientDashboardActivity extends ACBaseActivity {
             mPresenter = new PatientDashboardVisitsPresenter(id, ((PatientVisitsFragment) fragment));
         }
         else if (fragment instanceof PatientVitalsFragment){
-            mPresenter = new PatientDashboardVitalsPresenter(id, ((PatientVitalsFragment) fragment));
+           // fragment.getArguments().getString(ApplicationConstants.BundleKeys.ENCOUNTERTYPE);
+            mPresenter = new PatientDashboardVitalsPresenter(id, ((PatientVitalsFragment) fragment),fragment.getArguments().getString(ApplicationConstants.BundleKeys.ENCOUNTERTYPE));
         }
         else if (fragment instanceof PatientChartsFragment){
             mPresenter = new PatientDashboardChartsPresenter(id,((PatientChartsFragment) fragment));

@@ -19,7 +19,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Encounter extends Resource implements Serializable{
+public class Encounter extends Resource implements Serializable,EncounterMethods{
 
     private Long id;
 
@@ -111,6 +111,11 @@ public class Encounter extends Resource implements Serializable{
         return display;
     }
 
+    @Override
+    public String getFormName() {
+        return encounterType.getDisplay();
+    }
+
     /**
      *
      * @param display
@@ -125,6 +130,7 @@ public class Encounter extends Resource implements Serializable{
      * @return
      *     The encounterDatetime
      */
+    @Override
     public Long getEncounterDatetime() {
         return DateUtils.convertTime(encounterDatetime);
     }
@@ -175,6 +181,13 @@ public class Encounter extends Resource implements Serializable{
      */
     public void setLocation(Resource location) {
         this.location = location;
+    }
+
+    @Override
+    public List<ObservationMethods> getObservationsMethods() {
+        List<ObservationMethods> obs = new ArrayList<ObservationMethods>();
+        obs.addAll(observations);
+        return obs;
     }
 
     /**
@@ -341,3 +354,5 @@ public class Encounter extends Resource implements Serializable{
     }
 
 }
+
+

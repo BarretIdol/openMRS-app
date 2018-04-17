@@ -165,9 +165,9 @@
     <string name="get_patient_from_database_error">Failed to fetch patient from database</string>
     <string name="action_start_visit">Start visit</string>
     <string name="patient_scroll_tab_details_label">Details</string>
-    <string name="patient_scroll_tab_diagnosis_label">Diagnosis</string>
-    <string name="patient_scroll_tab_encounters_label">Encounters</string>
-    <string name="patient_scroll_tab_vitals_label">Vitals</string>
+    <string name="patient_scroll_tab_diagnosis_label">+Info</string>
+    <string name="patient_scroll_tab_encounters_label">Forms</string>
+    <string name="patient_scroll_tab_vitals_label">Risk Factors</string>
     <string name="patient_scroll_tab_charts_label">Charts</string>
     <string name="download_started">"Downloading…"</string>
     <string name="action_starting_visit">"Starting Visit"</string>

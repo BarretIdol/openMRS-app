@@ -28,13 +28,17 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import org.openmrs.mobile.R;
+import org.openmrs.mobile.activities.formdisplay.FormDisplayActivity;
 import org.openmrs.mobile.activities.formview.FormViewActivity;
 import org.openmrs.mobile.activities.patientdashboard.PatientDashboardActivity;
 import org.openmrs.mobile.activities.patientdashboard.PatientDashboardContract;
 import org.openmrs.mobile.activities.patientdashboard.PatientDashboardFragment;
 import org.openmrs.mobile.activities.visitdashboard.VisitDashboardActivity;
+import org.openmrs.mobile.bundle.FormFieldsWrapper;
+import org.openmrs.mobile.dao.PatientDAO;
 import org.openmrs.mobile.models.Encounter;
 import org.openmrs.mobile.models.Encountercreate;
+import org.openmrs.mobile.models.Form;
 import org.openmrs.mobile.models.Visit;
 import org.openmrs.mobile.utilities.ApplicationConstants;
 import org.openmrs.mobile.utilities.ToastUtil;
@@ -45,6 +49,7 @@ public class PatientVisitsFragment extends PatientDashboardFragment implements P
 
     private RecyclerView visitRecyclerView;
     private TextView emptyList;
+    public Encounter enc;
 
     public static final int REQUEST_CODE_FOR_VISIT = 1;
 
@@ -126,10 +131,23 @@ public class PatientVisitsFragment extends PatientDashboardFragment implements P
     }
 
     @Override
-    public void goToVisitDashboard(Long visitID) {
-        Intent intent = new Intent(this.getActivity(), FormViewActivity.class);
-        intent.putExtra(ApplicationConstants.BundleKeys.ENCOUNTER_ID, visitID);
-        startActivityForResult(intent, REQUEST_CODE_FOR_VISIT);
+    public void goToVisitDashboard(Long visitID,Boolean sync) {
+       /* if (sync) {
+            Form form = enc.getForm();
+            Intent intent = new Intent(getContext(), FormDisplayActivity.class);
+            intent.putExtra(ApplicationConstants.BundleKeys.FORM_NAME, form.getName());
+            intent.putExtra(ApplicationConstants.BundleKeys.PATIENT_ID_BUNDLE, this.mPresenter.getPatientId());
+            intent.putExtra(ApplicationConstants.BundleKeys.VALUEREFERENCE, form.getValueReference());
+            intent.putExtra(ApplicationConstants.BundleKeys.ENCOUNTERTYPE, enc.getEncounterType().getUuid());
+            intent.putExtra(ApplicationConstants.BundleKeys.ENCOUNTER_SYNC, true);
+            intent.putParcelableArrayListExtra(ApplicationConstants.BundleKeys.FORM_FIELDS_LIST_BUNDLE, FormFieldsWrapper.create(enc));
+            startActivity(intent);
+        }
+        else {*/
+            Intent intent = new Intent(this.getActivity(), FormViewActivity.class);
+            intent.putExtra(ApplicationConstants.BundleKeys.ENCOUNTER_ID, visitID);
+            intent.putExtra(ApplicationConstants.BundleKeys.ENCOUNTER_SYNC, sync);
+            startActivityForResult(intent, REQUEST_CODE_FOR_VISIT);
     }
 
     @Override

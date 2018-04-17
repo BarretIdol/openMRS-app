@@ -38,7 +38,6 @@ public class EncounterType extends Model implements Serializable {
     @Expose
     private List<Link> links = new ArrayList<Link>();
 
-    public static final String PRUEBA = "Prueba";
     public static final String VITALS = "Vitals";
     public static final String VISIT_NOTE = "Visit Note";
     public static final String DISCHARGE = "Discharge";
@@ -46,9 +45,10 @@ public class EncounterType extends Model implements Serializable {
     public static final String ADMISSION = "Admission";
     public static final String VITALS_PRES="Vitals pres";
     public static final String PHARMACOLOGICAL="Pharmacological";
-    public static final String NON_PHARMACOLOGICAL="Non Pharmacological pres";
     public static final String TEST_ADHERENCE="Test Adherence";
-    public static final String PERSONAL_DATA="Personal data";
+    public static final String PERSONAL_DATA="Personal Data";
+    public static final String RISK_FACTORS="Risk Factors";
+    public static final String MED_BACKGROUND="Medical Background";
 
     public EncounterType() {}
 

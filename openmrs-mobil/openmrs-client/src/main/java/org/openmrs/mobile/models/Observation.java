@@ -13,10 +13,13 @@ package org.openmrs.mobile.models;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import org.openmrs.mobile.dao.ConceptDAO;
+import org.openmrs.mobile.utilities.DateUtils;
+
 import java.io.Serializable;
 
 
-public class Observation extends Resource implements Serializable {
+public class Observation extends Resource implements Serializable,ObservationMethods {
 
     @SerializedName("concept")
     @Expose
@@ -112,6 +115,7 @@ public class Observation extends Resource implements Serializable {
     public String getObsDatetime() {
         return obsDatetime;
     }
+
 
     /**
      *
@@ -318,11 +322,26 @@ public class Observation extends Resource implements Serializable {
         this.id = id;
     }
 
+    @Override
+    public String getConceptUuid() {
+        if (concept != null) return concept.getUuid();
+        else return null;
+    }
+    @Override
     public String getDisplayValue() {
         if (displayValue == null && display != null && display.contains(":")) {
             setDisplayValue(display.split(":")[1]);
         }
         return displayValue;
+    }
+    @Override
+    public String getDisplay() {
+        return new ConceptDAO().findConceptsByUUID(this.getConceptUuid()).getDisplay();
+    }
+
+    @Override
+    public Long getObservationDateTime() {
+            return DateUtils.convertTime(obsDatetime);
     }
 
     public void setDisplayValue(String displayValue) {
@@ -362,3 +381,5 @@ public class Observation extends Resource implements Serializable {
     }
 
 }
+
+

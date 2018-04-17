@@ -87,11 +87,15 @@ import org.openmrs.mobile.activities.ACBaseActivity;
 import org.openmrs.mobile.activities.ACBaseFragment;
 import org.openmrs.mobile.activities.dialog.CustomFragmentDialog;
 import org.openmrs.mobile.activities.dialog.CameraOrGalleryPickerDialog;
+import org.openmrs.mobile.activities.formdisplay.FormDisplayActivity;
 import org.openmrs.mobile.activities.patientdashboard.PatientDashboardActivity;
 import org.openmrs.mobile.activities.patientdashboard.details.PatientPhotoActivity;
 import org.openmrs.mobile.application.OpenMRSLogger;
 import org.openmrs.mobile.bundle.CustomDialogBundle;
 import org.openmrs.mobile.listeners.watcher.PatientBirthdateValidatorWatcher;
+import org.openmrs.mobile.models.EncounterType;
+import org.openmrs.mobile.models.Form;
+import org.openmrs.mobile.models.FormResource;
 import org.openmrs.mobile.models.Patient;
 import org.openmrs.mobile.models.Person;
 import org.openmrs.mobile.models.PersonAddress;
@@ -100,6 +104,7 @@ import org.openmrs.mobile.models.PersonAttributeType;
 import org.openmrs.mobile.models.PersonName;
 import org.openmrs.mobile.utilities.ApplicationConstants;
 import org.openmrs.mobile.utilities.DateUtils;
+import org.openmrs.mobile.utilities.FormService;
 import org.openmrs.mobile.utilities.ImageUtils;
 import org.openmrs.mobile.utilities.StringUtils;
 import org.openmrs.mobile.utilities.ToastUtil;
@@ -134,7 +139,7 @@ public class AddEditPatientFragment extends ACBaseFragment<AddEditPatientContrac
     private DateTime bdt;
 
     private EditText edfname;
-   // private EditText edmname;
+    // private EditText edmname;
     private EditText edhclinic;
     private EditText edlname;
     private EditText eddob;
@@ -179,27 +184,39 @@ public class AddEditPatientFragment extends ACBaseFragment<AddEditPatientContrac
         addSuggestionsToAutoCompleTextView();
         addListeners();
         fillFields(mPresenter.getPatientToUpdate());
-       updateGPSEditext();
+        updateGPSEditext();
         return root;
     }
+
     private FusedLocationProviderClient mFusedLocationClient;
- public void updateGPSEditext(){
-     mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this.getActivity());
-     mFusedLocationClient.getLastLocation()
-             .addOnSuccessListener(this.getActivity(), new OnSuccessListener<Location>() {
-                 @Override
-                 public void onSuccess(Location location) {
-                     // Got last known location. In some rare situations this can be null.
-                     Log.d("getGPSData.java", "hola 3");
 
-                     if (location != null) {
-                         // Logic to handle location object
-                         Log.d("getGPSData.java", "gps:"+location.getLatitude()+":"+location.getLongitude());
-                         edpostal.setText("lat:"+location.getLatitude()+":long:"+location.getLongitude());
+    public void updateGPSEditext() {
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this.getActivity());
+       /* if (ActivityCompat.checkSelfPermission(super.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(super.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }*/
+        mFusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this.getActivity(), new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // Got last known location. In some rare situations this can be null.
+                        Log.d("getGPSData.java", "hola 3");
 
-                     }
-                 }
-             });
+                        if (location != null) {
+                            // Logic to handle location object
+                            Log.d("getGPSData.java", "gps:" + location.getLatitude() + ":" + location.getLongitude());
+                            edpostal.setText("lat:" + location.getLatitude() + ":long:" + location.getLongitude());
+
+                        }
+                    }
+                });
  }
     @Override
     public void finishPatientInfoActivity() {
@@ -384,10 +401,25 @@ public class AddEditPatientFragment extends ACBaseFragment<AddEditPatientContrac
     }
 
     @Override
-    public void startPatientDashbordActivity(Patient patient) {
-        Intent intent = new Intent(getActivity(), PatientDashboardActivity.class);
+    public void startPatientDashbordActivity(Patient patient) { //edited by hector
+        Intent intent = new Intent(getContext(), FormDisplayActivity.class);
+        intent.putExtra(ApplicationConstants.BundleKeys.FORM_NAME, EncounterType.PERSONAL_DATA);
         intent.putExtra(ApplicationConstants.BundleKeys.PATIENT_ID_BUNDLE, patient.getId());
-        startActivity(intent);
+        String valueRef = "";
+        for (FormResource f : FormService.getFormResourceByName(EncounterType.PERSONAL_DATA).getResourceList()) { //in case in the future we add formResources
+            if (f.getName().equals("json"))
+               valueRef = f.getValueReference();
+        }
+        if (StringUtils.notEmpty(valueRef)) {
+        intent.putExtra(ApplicationConstants.BundleKeys.VALUEREFERENCE, valueRef);
+        intent.putExtra(ApplicationConstants.BundleKeys.ENCOUNTERTYPE, EncounterType.PERSONAL_DATA);
+        startActivity(intent);}
+        else {
+            ToastUtil.error("There is no json resource for Form " + EncounterType.PERSONAL_DATA);
+        }
+       /* Intent intent = new Intent(getActivity(), PatientDashboardActivity.class);
+        intent.putExtra(ApplicationConstants.BundleKeys.PATIENT_ID_BUNDLE, patient.getId());
+        startActivity(intent);*/
     }
 
     @Override

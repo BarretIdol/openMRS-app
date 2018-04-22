@@ -60,8 +60,8 @@ public class PatientDashboardDetailsPresenter extends PatientDashboardMainPresen
         if(NetworkUtils.isOnline()) {
             mPatientDetailsView.showDialog(R.string.action_synchronize_patients);
             syncDetailsData();
-            syncVisitsData();
-            syncVitalsData();
+            //syncVisitsData();
+            syncEncounters();
         }
         else {
             reloadPatientData(mPatient);
@@ -73,7 +73,7 @@ public class PatientDashboardDetailsPresenter extends PatientDashboardMainPresen
         if(NetworkUtils.isOnline()) {
             syncDetailsData();
             syncVisitsData();
-            syncVitalsData();
+            syncEncounters();
         }
     }
 
@@ -104,10 +104,10 @@ public class PatientDashboardDetailsPresenter extends PatientDashboardMainPresen
     }
 
     /*
-    * Sync Vitals
+    * SyncBPUPEncounters
     */
-    private void syncVitalsData() {
-        visitApi.syncLastVitals(mPatient.getUuid());
+    private void syncEncounters() {
+        visitApi.syncBPUPEncounters(mPatient.getUuid());
     }
 
     /*

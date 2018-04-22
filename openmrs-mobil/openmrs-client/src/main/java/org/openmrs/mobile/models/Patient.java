@@ -152,16 +152,19 @@ public class Patient extends Resource implements Serializable{
             if (encounters.contains(",")) {
                 String [] enc = encounters.split(",");
                 for (String s: enc) {
-                    Encountercreate e = new Encountercreate().load(Encountercreate.class,Long.parseLong(s));
+                    Encountercreate e = new Encountercreate()
+                            .load(Encountercreate.class,Long.parseLong(s));
                     if (!e.getSynced())
                         ret.add(e);
 
                 }
             }
             else {
-                Encountercreate e = new Encountercreate().load(Encountercreate.class,Long.parseLong(encounters));
+                Encountercreate e = new Encountercreate()
+                        .load(Encountercreate.class,Long.parseLong(encounters));
                 if (!e.getSynced())
-                    ret.add(new Encountercreate().load(Encountercreate.class,Long.parseLong(encounters)));
+                    ret.add(new Encountercreate()
+                            .load(Encountercreate.class,Long.parseLong(encounters)));
             }
         }
         return ret;

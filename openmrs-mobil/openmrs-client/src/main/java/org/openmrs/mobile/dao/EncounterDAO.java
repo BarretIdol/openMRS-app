@@ -356,7 +356,8 @@ public class EncounterDAO {
 
         String where = String.format("%s = ?", EncounterTable.Column.PATIENT_UUID);
         String[] whereArgs = new String[]{patientUUID};
-        final Cursor cursor = helper.getReadableDatabase().query(EncounterTable.TABLE_NAME, null, where , whereArgs, null, null, EncounterTable.Column.ENCOUNTER_DATETIME + " DESC");
+        final Cursor cursor = helper.getReadableDatabase().query(EncounterTable.TABLE_NAME, null, where , whereArgs,
+                null, null, EncounterTable.Column.ENCOUNTER_DATETIME + " DESC");
         if (null != cursor) {
             try {
                 while (cursor.moveToNext()) {
@@ -414,13 +415,15 @@ public class EncounterDAO {
             return true;
         });
     }
-    public Encounter getStaticFormEncounter1(String patientUUID, String encounterType) {  //changed
+    public Encounter getStaticFormEncounter1(String patientUUID, String encounterType) {  //changed added by hector
             DBOpenHelper helper = OpenMRSDBOpenHelper.getInstance().getDBOpenHelper();
             Encounter encounter = null;
 
-            String where = String.format("%s = ? AND %s = ? ORDER BY %s DESC LIMIT 1", EncounterTable.Column.PATIENT_UUID, EncounterTable.Column.ENCOUNTER_TYPE, EncounterTable.Column.ENCOUNTER_DATETIME);
+            String where = String.format("%s = ? AND %s = ? ORDER BY %s DESC LIMIT 1",
+                    EncounterTable.Column.PATIENT_UUID, EncounterTable.Column.ENCOUNTER_TYPE, EncounterTable.Column.ENCOUNTER_DATETIME);
             String[] whereArgs = new String[]{patientUUID, encounterType};
-            final Cursor cursor = helper.getReadableDatabase().query(EncounterTable.TABLE_NAME, null, where, whereArgs, null, null, null);
+            final Cursor cursor = helper.getReadableDatabase().query(EncounterTable.TABLE_NAME,
+                    null, where, whereArgs, null, null, null);
             if (null != cursor) {
                 try {
                     if (cursor.moveToFirst()) {

@@ -10,15 +10,21 @@
 
 package org.openmrs.mobile.activities.formdisplay;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.SparseArray;
 
 import com.activeandroid.Model;
 
 import org.joda.time.LocalDateTime;
+import org.openmrs.mobile.R;
 import org.openmrs.mobile.activities.BasePresenter;
+import org.openmrs.mobile.activities.syncedpatients.SyncedPatientsActivity;
 import org.openmrs.mobile.api.EncounterService;
 import org.openmrs.mobile.api.RestApi;
 import org.openmrs.mobile.api.retrofit.VisitApi;
@@ -51,6 +57,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
+import static android.content.Context.NOTIFICATION_SERVICE;
 import static org.openmrs.mobile.utilities.FormService.getFormResourceByName;
 
 public class FormDisplayMainPresenter extends BasePresenter implements FormDisplayContract.Presenter.MainPresenter {
@@ -76,6 +83,7 @@ public class FormDisplayMainPresenter extends BasePresenter implements FormDispl
     public void subscribe() {
         // This method is intentionally empty
     }
+
 
     @Override
     public void createEncounter() {

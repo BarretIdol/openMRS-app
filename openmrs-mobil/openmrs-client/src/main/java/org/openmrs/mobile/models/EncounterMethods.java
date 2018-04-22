@@ -10,16 +10,6 @@ public interface EncounterMethods {
     /*gets list of Observations/Obscreate as ObservationMethods*/
     public List<ObservationMethods> getObservationsMethods();
 
-    //public String getUuid();
-
-    //public String getDisplay();
-
-    //public String getEncounterDate();
-
-    //public Resource getLocation();
-
-    //public String getFormUuid();
-
     /*returns the form of the encounter*/
     public Form getForm();
 

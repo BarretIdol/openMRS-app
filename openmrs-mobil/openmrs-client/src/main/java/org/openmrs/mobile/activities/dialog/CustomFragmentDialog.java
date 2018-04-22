@@ -48,7 +48,7 @@ import org.openmrs.mobile.activities.addeditpatient.SimilarPatientsRecyclerViewA
 import org.openmrs.mobile.activities.login.LoginActivity;
 import org.openmrs.mobile.activities.login.LoginFragment;
 import org.openmrs.mobile.activities.patientdashboard.PatientDashboardActivity;
-import org.openmrs.mobile.activities.patientdashboard.visits.PatientVisitsFragment;
+import org.openmrs.mobile.activities.patientdashboard.encounters.PatientEncountersFragment;
 import org.openmrs.mobile.activities.visitdashboard.VisitDashboardActivity;
 import org.openmrs.mobile.application.OpenMRS;
 import org.openmrs.mobile.bundle.CustomDialogBundle;
@@ -381,15 +381,15 @@ public class CustomFragmentDialog extends DialogFragment {
         if (activity instanceof PatientDashboardActivity) {
             PatientDashboardActivity pda = ((PatientDashboardActivity) activity);
             List<Fragment> fragments = pda.getSupportFragmentManager().getFragments();
-            PatientVisitsFragment fragment = null;
+            PatientEncountersFragment fragment = null;
             for (Fragment frag : fragments) {
-                if (frag instanceof PatientVisitsFragment) {
-                    fragment = (PatientVisitsFragment) frag;
+                if (frag instanceof PatientEncountersFragment) {
+                    fragment = (PatientEncountersFragment) frag;
                     break;
                 }
             }
             if (fragment != null) {
-                fragment.startVisit();
+                //fragment.startVisit();
             }
         }
     }

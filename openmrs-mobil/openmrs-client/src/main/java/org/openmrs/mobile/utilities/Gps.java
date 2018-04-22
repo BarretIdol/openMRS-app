@@ -18,6 +18,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 
+import org.openmrs.mobile.activities.formdisplay.FormDisplayPageFragment;
 import org.xml.sax.Locator;
 
 import java.util.List;
@@ -36,11 +37,13 @@ public class Gps implements LocationListener {
     private Location location;
     private Context context;
     LocationManager locationManager;
+    GPSListener gpsL;
 
-    public Gps(Context context) {
+    public Gps(Context context, GPSListener gps) {
         super();
         this.context = context;
         this.locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        this.gpsL = gps;
     }
 
     private void requestUpdates(String provider) {
@@ -99,6 +102,9 @@ public class Gps implements LocationListener {
     public void onLocationChanged(Location locationN) {
         Log.d(TAG, "Location changed: " + location.getLatitude() + ", " + location.getLongitude());
         this.location = locationN;
+        gpsL.onGPSResult();
+        this.locationManager.removeUpdates(this);
+
     }
 
     @Override
@@ -123,4 +129,10 @@ public class Gps implements LocationListener {
 
         }
     }
+
+    public interface GPSListener {
+
+        public void onGPSResult();
+
+    };
 }

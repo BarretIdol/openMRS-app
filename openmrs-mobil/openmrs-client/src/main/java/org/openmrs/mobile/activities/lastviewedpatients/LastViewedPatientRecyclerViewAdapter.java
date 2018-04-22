@@ -351,8 +351,8 @@ class LastViewedPatientRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                 new PatientDAO().savePatient(newPatient)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(id -> {
-                            new VisitApi().syncVisitsData(newPatient);
-                            new VisitApi().syncLastVitals(newPatient.getUuid());
+                            //new VisitApi().syncVisitsData(newPatient);
+                            new VisitApi().syncBPUPEncounters(newPatient.getUuid());// aqui sincroniza los encounters
                             patients.remove(patient);
                             notifyDataSetChanged();
                             if (showSnackBar) {
@@ -376,7 +376,7 @@ class LastViewedPatientRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                 ToastUtil.error("Failed to fetch patient data");
             }
         });
-        new VisitApi().syncLastVitals(patient.getUuid());
+        new VisitApi().syncBPUPEncounters(patient.getUuid());
     }
 
     public void disableCheckBox(PatientViewHolder holder) {

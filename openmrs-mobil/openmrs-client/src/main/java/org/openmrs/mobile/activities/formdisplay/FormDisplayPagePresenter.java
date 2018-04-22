@@ -17,6 +17,7 @@ import org.openmrs.mobile.bundle.FormFieldsWrapper;
 import org.openmrs.mobile.models.Page;
 import org.openmrs.mobile.models.Question;
 import org.openmrs.mobile.models.Section;
+import org.openmrs.mobile.utilities.ApplicationConstants;
 
 import java.util.List;
 
@@ -24,6 +25,7 @@ public class FormDisplayPagePresenter extends BasePresenter implements FormDispl
 
     private FormDisplayContract.View.PageView mFormDisplayPageView;
     private Page mPage;
+
 
     public FormDisplayPagePresenter(FormDisplayContract.View.PageView mFormPageView, Page page) {
         this.mFormDisplayPageView = mFormPageView;

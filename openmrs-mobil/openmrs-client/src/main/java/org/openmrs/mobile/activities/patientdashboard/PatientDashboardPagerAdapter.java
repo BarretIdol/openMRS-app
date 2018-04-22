@@ -25,12 +25,10 @@ import org.openmrs.mobile.activities.patientdashboard.charts.PatientChartsFragme
 import org.openmrs.mobile.activities.patientdashboard.charts.PatientDashboardChartsPresenter;
 import org.openmrs.mobile.activities.patientdashboard.details.PatientDashboardDetailsPresenter;
 import org.openmrs.mobile.activities.patientdashboard.details.PatientDetailsFragment;
-import org.openmrs.mobile.activities.patientdashboard.diagnosis.PatientDashboardDiagnosisPresenter;
-import org.openmrs.mobile.activities.patientdashboard.diagnosis.PatientDiagnosisFragment;
-import org.openmrs.mobile.activities.patientdashboard.visits.PatientDashboardVisitsPresenter;
-import org.openmrs.mobile.activities.patientdashboard.visits.PatientVisitsFragment;
-import org.openmrs.mobile.activities.patientdashboard.vitals.PatientDashboardVitalsPresenter;
-import org.openmrs.mobile.activities.patientdashboard.vitals.PatientVitalsFragment;
+import org.openmrs.mobile.activities.patientdashboard.encounters.PatientDashboardEncountersPresenter;
+import org.openmrs.mobile.activities.patientdashboard.encounters.PatientEncountersFragment;
+import org.openmrs.mobile.activities.patientdashboard.vitals.PatientStaticEncounterPresenter;
+import org.openmrs.mobile.activities.patientdashboard.vitals.PatientStaticEncounterFragment;
 import org.openmrs.mobile.models.EncounterType;
 import org.openmrs.mobile.utilities.ApplicationConstants;
 
@@ -62,21 +60,21 @@ class PatientDashboardPagerAdapter extends FragmentPagerAdapter {
                 new PatientDashboardDetailsPresenter(mPatientId, patientDetailsFragment);
                 return patientDetailsFragment;
             case PERSONAL_TAB_POS:
-                PatientVitalsFragment patientPersonalFragment = PatientVitalsFragment.newInstance();
+                PatientStaticEncounterFragment patientPersonalFragment = PatientStaticEncounterFragment.newInstance();
                 data.putString(ApplicationConstants.BundleKeys.ENCOUNTERTYPE,EncounterType.PERSONAL_DATA);
                 patientPersonalFragment.setArguments(data);
-                new PatientDashboardVitalsPresenter(mPatientId, patientPersonalFragment,""); //why?
+                new PatientStaticEncounterPresenter(mPatientId, patientPersonalFragment,""); //why?
                 return patientPersonalFragment;
             case FORMS_TAB_POS:
-                PatientVisitsFragment patientVisitsFragment = PatientVisitsFragment.newInstance();
-                new PatientDashboardVisitsPresenter(mPatientId, patientVisitsFragment);
-                return patientVisitsFragment;
+                PatientEncountersFragment patientEncountersFragment = PatientEncountersFragment.newInstance();
+                new PatientDashboardEncountersPresenter(mPatientId, patientEncountersFragment);
+                return patientEncountersFragment;
             case FACTORS_TAB_POS:
-                PatientVitalsFragment patientVitalsFragment = PatientVitalsFragment.newInstance();
+                PatientStaticEncounterFragment patientStaticEncounterFragment = PatientStaticEncounterFragment.newInstance();
                 data.putString(ApplicationConstants.BundleKeys.ENCOUNTERTYPE,EncounterType.RISK_FACTORS);
-                patientVitalsFragment.setArguments(data);
-                new PatientDashboardVitalsPresenter(mPatientId, patientVitalsFragment,""); //why?
-                return patientVitalsFragment;
+                patientStaticEncounterFragment.setArguments(data);
+                new PatientStaticEncounterPresenter(mPatientId, patientStaticEncounterFragment,""); //why?
+                return patientStaticEncounterFragment;
             case CHARTS_TAB_POS:
                 PatientChartsFragment patientChartsFragment = PatientChartsFragment.newInstance();
                 new PatientDashboardChartsPresenter(mPatientId, patientChartsFragment);

@@ -90,27 +90,31 @@ public class PatientChartsFragment extends PatientDashboardFragment implements P
         }
     }
 
-    @Override
-    public void populateList(List<Encounter> encounters) {
-        // passar amb EncounterMethods i ObservableMethods
-        //final String[] displayableEncounterTypes = ApplicationConstants.EncounterTypes.ENCOUNTER_TYPES_DISPLAYS;
-        final String[] displayableEncounterTypes = {EncounterType.VITALSBPUP};
-        final HashSet<String> displayableEncounterTypesArray = new HashSet<>(Arrays.asList(displayableEncounterTypes));
-        JSONObject observationList = new JSONObject();
-        List <EncounterMethods> encounterMethods = new ArrayList<EncounterMethods>();
-        encounterMethods.addAll(encounters);
-        encounterMethods.addAll(new PatientDAO().findPatientByID(String.valueOf(mPresenter.getPatientId())).getEncountercreates());
-        /*for (Encounter visit : visits) {
+
+     /*for (Encounter visit : visits) {
             //List<Encounter> encounters = visit.getEncounters();
             if (!encounters.isEmpty()) {
                 setEmptyListVisibility(false);*/
+
+    @Override
+    public void populateList(List<Encounter> encounters) {
+        final String[] displayableEncounterTypes = {EncounterType.VITALSBPUP};
+        final HashSet<String> displayableEncounterTypesArray =
+                new HashSet<>(Arrays.asList(displayableEncounterTypes));
+        JSONObject observationList = new JSONObject();
+        List <EncounterMethods> encounterMethods = new ArrayList<EncounterMethods>();
+        encounterMethods.addAll(encounters);
+        encounterMethods.addAll(new PatientDAO().findPatientByID(String.valueOf
+                (mPresenter.getPatientId())).getEncountercreates());
                 for (EncounterMethods encounter : encounterMethods) {
                     String datetime = DateUtils.convertTime(encounter.getEncounterDatetime());
                     String encounterTypeDisplay = encounter.getFormName();
                     if (displayableEncounterTypesArray.contains(encounterTypeDisplay)) {
                         for (ObservationMethods obs : encounter.getObservationsMethods()) {
-                            if (obs.getConceptUuid().equals(ApplicationConstants.ConceptUuids.BMI) || obs.getConceptUuid().equals(ApplicationConstants.ConceptUuids.DIASTOLIC)
-                                    || obs.getConceptUuid().equals(ApplicationConstants.ConceptUuids.SYSTOLIC) || obs.getConceptUuid().equals(ApplicationConstants.ConceptUuids.PULSE)) {
+                            if (obs.getConceptUuid().equals(ApplicationConstants.ConceptUuids.BMI) ||
+                                    obs.getConceptUuid().equals(ApplicationConstants.ConceptUuids.DIASTOLIC)
+                                    || obs.getConceptUuid().equals(ApplicationConstants.ConceptUuids.SYSTOLIC) ||
+                                    obs.getConceptUuid().equals(ApplicationConstants.ConceptUuids.PULSE)) {
                                 String observationLabel = obs.getDisplay();
                                 if (observationLabel.contains(":")) {
                                     observationLabel = observationLabel.substring(0, observationLabel.indexOf(':'));

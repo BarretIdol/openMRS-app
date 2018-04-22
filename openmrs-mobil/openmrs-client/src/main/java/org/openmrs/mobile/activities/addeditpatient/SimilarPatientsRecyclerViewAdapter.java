@@ -122,8 +122,8 @@ public class SimilarPatientsRecyclerViewAdapter extends RecyclerView.Adapter<Sim
         new PatientDAO().savePatient(patient)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(id -> {
-                    new VisitApi().syncVisitsData(patient);
-                    new VisitApi().syncLastVitals(patient.getUuid());
+                   // new VisitApi().syncVisitsData(patient);
+                    new VisitApi().syncBPUPEncounters(patient.getUuid());
                 });
     }
 

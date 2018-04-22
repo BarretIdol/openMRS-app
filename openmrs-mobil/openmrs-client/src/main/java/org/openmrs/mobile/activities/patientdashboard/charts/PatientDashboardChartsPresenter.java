@@ -35,7 +35,7 @@ public class PatientDashboardChartsPresenter extends PatientDashboardMainPresent
     }
 
     @Override
-    public void subscribe() {
+    public void subscribe() { //changed by hector
         addSubscription(encounterDAO.findEncountersByPatientUuid(mPatient.getUuid())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(encounters -> {

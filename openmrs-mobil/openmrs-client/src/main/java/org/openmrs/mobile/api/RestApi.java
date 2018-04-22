@@ -121,11 +121,11 @@ public interface RestApi {
     Call<Results<VisitType>> getVisitType();
 
     @GET("encounter")
-    Call<Results<Encounter>> getLastVitals(@Query("patient") String patientUUID,
-                                  @Query("encounterType") String encounterType,
-                                  @Query("v") String representation,
-                                  @Query("limit") int limit,
-                                  @Query("order") String order);
+    Call<Results<Encounter>> getEncounters(@Query("patient") String patientUUID,
+                                           @Query("encounterType") String encounterType,
+                                           @Query("v") String representation,
+                                           @Query("limit") int limit,
+                                           @Query("order") String order);
 
     @POST("patient/{uuid}")
     Call<Patient> updatePatient(@Body Patient patient, @Path("uuid") String uuid,

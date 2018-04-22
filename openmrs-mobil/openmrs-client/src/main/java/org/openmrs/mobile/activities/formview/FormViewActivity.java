@@ -20,6 +20,7 @@ public class FormViewActivity extends ACBaseActivity {
     RecyclerView recycler;
     long encID;
     Boolean sync;
+    FormViewActivityPresenter mFormViewActivityPresenter;
 
 
     @Override
@@ -29,12 +30,16 @@ public class FormViewActivity extends ACBaseActivity {
 
         recycler = (RecyclerView) findViewById(R.id.encounter_recycle_view);
         recycler.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false));
-        ObservationDAO observationDAO = new ObservationDAO();
         Bundle bundle = getIntent().getExtras();
         encID = bundle.getLong(ApplicationConstants.BundleKeys.ENCOUNTER_ID);
         sync = bundle.getBoolean(ApplicationConstants.BundleKeys.ENCOUNTER_SYNC);
         EncounterAdapter adapter;
-        if (sync)
+        mFormViewActivityPresenter = new FormViewActivityPresenter(recycler);
+        mFormViewActivityPresenter.setAdapter(encID,sync);
+
+    }
+}
+ /* if (sync)
             adapter = new EncounterAdapter(observationDAO.findObservationByEncounterID(encID),null);
         else {
             Encountercreate encounter = new Encountercreate().load(Encountercreate.class, encID);
@@ -42,6 +47,4 @@ public class FormViewActivity extends ACBaseActivity {
             adapter = new EncounterAdapter(null,encounter.getObservations());
         }
 
-        recycler.setAdapter(adapter);
-    }
-}
+        recycler.setAdapter(adapter);*/

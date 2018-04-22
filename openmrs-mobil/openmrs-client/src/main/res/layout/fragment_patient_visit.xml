@@ -19,16 +19,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <android.support.v7.widget.RecyclerView android:id="@+id/patientVisitRecyclerView"
+    <android.support.v7.widget.RecyclerView android:id="@+id/patientEncounterRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         />
 
-    <TextView android:id="@+id/emptyVisitsList"
+    <TextView android:id="@+id/emptyEncouterList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
         android:visibility="gone"
-        android:text="@string/empty_visits_list"/>
+        android:text="@string/empty_encounters_list"/>
 
 </LinearLayout>

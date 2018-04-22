@@ -48,19 +48,19 @@ public interface PatientDashboardContract {
         void setDiagnosesToDisplay(List<String> encounters);
     }
 
-    interface ViewPatientVisits extends ViewPatientMain {
+    interface ViewPatientEncounters extends ViewPatientMain {
         void showErrorToast(String message);
         void dismissCurrentDialog();
         void toggleRecyclerListVisibility(boolean isVisible);
-        void setVisitsToDisplay(List<Encounter> visits, List<Encountercreate> encountercreates);
-        void goToVisitDashboard(Long visitID,Boolean sync);
-        void showStartVisitDialog(boolean isVisitPossible);
-        void showStartVisitProgressDialog();
+        void setEncountersToDisplay(List<Encounter> visits, List<Encountercreate> encountercreates);
+        void goToFormViewActivity(Long visitID, Boolean sync);
+       /* void showStartVisitDialog(boolean isVisitPossible);
+        void showStartVisitProgressDialog();*/
     }
 
-    interface ViewPatientVitals extends ViewPatientMain {
-        void showNoVitalsNotification();
-        void showEncounterVitals(EncounterMethods encounter);
+    interface ViewStaticEncounter extends ViewPatientMain {
+        void showNoEncountersNotification();
+        void showStaticEncounter(EncounterMethods encounter);
         void startFormDisplayActivity(Encounter lastVitalsEncounter);
         void showErrorToast(String errorMessage);
     }
@@ -95,7 +95,7 @@ public interface PatientDashboardContract {
         void startVisit();
     }
 
-    interface PatientVitalsPresenter extends PatientDashboardMainPresenter {
+    interface PatientStaticEncounterPresenter extends PatientDashboardMainPresenter {
         void startFormDisplayActivityWithEncounter();
     }
 

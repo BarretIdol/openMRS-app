@@ -30,10 +30,10 @@ import org.openmrs.mobile.activities.patientdashboard.details.PatientDashboardDe
 import org.openmrs.mobile.activities.patientdashboard.details.PatientDetailsFragment;
 import org.openmrs.mobile.activities.patientdashboard.diagnosis.PatientDashboardDiagnosisPresenter;
 import org.openmrs.mobile.activities.patientdashboard.diagnosis.PatientDiagnosisFragment;
-import org.openmrs.mobile.activities.patientdashboard.visits.PatientDashboardVisitsPresenter;
-import org.openmrs.mobile.activities.patientdashboard.visits.PatientVisitsFragment;
-import org.openmrs.mobile.activities.patientdashboard.vitals.PatientDashboardVitalsPresenter;
-import org.openmrs.mobile.activities.patientdashboard.vitals.PatientVitalsFragment;
+import org.openmrs.mobile.activities.patientdashboard.encounters.PatientDashboardEncountersPresenter;
+import org.openmrs.mobile.activities.patientdashboard.encounters.PatientEncountersFragment;
+import org.openmrs.mobile.activities.patientdashboard.vitals.PatientStaticEncounterPresenter;
+import org.openmrs.mobile.activities.patientdashboard.vitals.PatientStaticEncounterFragment;
 import org.openmrs.mobile.utilities.ApplicationConstants;
 import org.openmrs.mobile.utilities.TabUtil;
 
@@ -128,12 +128,12 @@ public class PatientDashboardActivity extends ACBaseActivity {
         else if (fragment instanceof PatientDiagnosisFragment) {
             mPresenter = new PatientDashboardDiagnosisPresenter(id, ((PatientDiagnosisFragment) fragment));
         }
-        else if (fragment instanceof PatientVisitsFragment) {
-            mPresenter = new PatientDashboardVisitsPresenter(id, ((PatientVisitsFragment) fragment));
+        else if (fragment instanceof PatientEncountersFragment) {
+            mPresenter = new PatientDashboardEncountersPresenter(id, ((PatientEncountersFragment) fragment));
         }
-        else if (fragment instanceof PatientVitalsFragment){
+        else if (fragment instanceof PatientStaticEncounterFragment){
            // fragment.getArguments().getString(ApplicationConstants.BundleKeys.ENCOUNTERTYPE);
-            mPresenter = new PatientDashboardVitalsPresenter(id, ((PatientVitalsFragment) fragment),fragment.getArguments().getString(ApplicationConstants.BundleKeys.ENCOUNTERTYPE));
+            mPresenter = new PatientStaticEncounterPresenter(id, ((PatientStaticEncounterFragment) fragment),fragment.getArguments().getString(ApplicationConstants.BundleKeys.ENCOUNTERTYPE));
         }
         else if (fragment instanceof PatientChartsFragment){
             mPresenter = new PatientDashboardChartsPresenter(id,((PatientChartsFragment) fragment));

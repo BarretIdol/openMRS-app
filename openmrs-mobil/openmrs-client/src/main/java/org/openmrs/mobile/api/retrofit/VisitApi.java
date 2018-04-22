@@ -123,13 +123,12 @@ public class VisitApi {
         });
     }
 
-    public void syncLastVitals(final String patientUuid) {
-        syncLastVitals(patientUuid, null);
+    public void syncBPUPEncounters(final String patientUuid) {
+        syncBPUPEncounters(patientUuid, null);
     }
 
-    public void syncLastVitals(final String patientUuid, @Nullable final DefaultResponseCallbackListener callbackListener) {
-        //Call<Results<Encounter>> call = restApi.getLastVitals(patientUuid, ApplicationConstants.EncounterTypes.VITALS, "full", 1,"desc");
-        Call<Results<Encounter>> call = restApi.getLastVitals(patientUuid, ApplicationConstants.EncounterTypes.VITALSBPUP, "full", 100,"desc"); // changed by hector
+    public void syncBPUPEncounters(final String patientUuid, @Nullable final DefaultResponseCallbackListener callbackListener) { /*created by hector*/
+        Call<Results<Encounter>> call = restApi.getEncounters(patientUuid, ApplicationConstants.EncounterTypes.VITALSBPUP, "full", 100,"desc");
         call.enqueue(new Callback<Results<Encounter>>() {
             @Override
             public void onResponse(Call<Results<Encounter>> call, Response<Results<Encounter>> response) {
@@ -137,7 +136,7 @@ public class VisitApi {
                     if (!response.body().getResults().isEmpty()) {
                         for (Encounter e : response.body().getResults()) {
                             //encounterDAO.saveLastVitalsEncounter(e, patientUuid);
-                            encounterDAO.syncBPUPEncounters(e,patientUuid); // changed by hector
+                            encounterDAO.syncBPUPEncounters(e,patientUuid);
                         }
                     }
                     if (callbackListener != null) {
@@ -158,7 +157,7 @@ public class VisitApi {
                 }
             }
         });
-        Call<Results<Encounter>> call2 = restApi.getLastVitals(patientUuid, ApplicationConstants.EncounterTypes.PERSONAL_DATA, "full", 1,"desc"); // changed by hector
+        Call<Results<Encounter>> call2 = restApi.getEncounters(patientUuid, ApplicationConstants.EncounterTypes.PERSONAL_DATA, "full", 1,"desc");
         call2.enqueue(new Callback<Results<Encounter>>() {
             @Override
             public void onResponse(Call<Results<Encounter>> call, Response<Results<Encounter>> response) {
@@ -187,8 +186,37 @@ public class VisitApi {
                 }
             }
         });
-        Call<Results<Encounter>> call3 = restApi.getLastVitals(patientUuid, ApplicationConstants.EncounterTypes.RISK_FACTORS, "full", 1,"desc"); // changed by hector
+        Call<Results<Encounter>> call3 = restApi.getEncounters(patientUuid, ApplicationConstants.EncounterTypes.RISK_FACTORS, "full", 1,"desc"); // changed by hector
         call3.enqueue(new Callback<Results<Encounter>>() {
+            @Override
+            public void onResponse(Call<Results<Encounter>> call, Response<Results<Encounter>> response) {
+                if (response.isSuccessful()) {
+                    if (!response.body().getResults().isEmpty()) {
+                        for (Encounter e : response.body().getResults()) {
+                            //encounterDAO.saveLastVitalsEncounter(e, patientUuid);
+                            encounterDAO.syncBPUPEncounters(e,patientUuid); // changed by hector
+                        }
+                    }
+                    if (callbackListener != null) {
+                        callbackListener.onResponse();
+                    }
+                }
+                else {
+                    if (callbackListener != null) {
+                        callbackListener.onErrorResponse(response.message());
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Results<Encounter>> call, Throwable t) {
+                if (callbackListener != null) {
+                    callbackListener.onErrorResponse(t.getMessage());
+                }
+            }
+        });
+        Call<Results<Encounter>> call4 = restApi.getEncounters(patientUuid, ApplicationConstants.EncounterTypes.MED_BACKGROUND, "full", 20,"desc"); // changed by hector
+        call4.enqueue(new Callback<Results<Encounter>>() {
             @Override
             public void onResponse(Call<Results<Encounter>> call, Response<Results<Encounter>> response) {
                 if (response.isSuccessful()) {

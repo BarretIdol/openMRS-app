@@ -21,7 +21,6 @@ import org.openmrs.mobile.api.retrofit.VisitApi;
 import org.openmrs.mobile.dao.PatientDAO;
 import org.openmrs.mobile.dao.VisitDAO;
 import org.openmrs.mobile.listeners.retrofit.DefaultResponseCallbackListener;
-import org.openmrs.mobile.listeners.retrofit.StartVisitResponseListenerCallback;
 import org.openmrs.mobile.models.Encounter;
 import org.openmrs.mobile.models.EncounterType;
 import org.openmrs.mobile.models.Encountercreate;
@@ -136,7 +135,7 @@ public class EncounterService extends IntentService {
                             linkvisit(encountercreate.getPatientId(),encountercreate.getFormname(), encounter, encountercreate);
                         encountercreate.setSynced(true);
                         encountercreate.save();
-                        new VisitApi().syncLastVitals(encountercreate.getPatient());
+                        new VisitApi().syncBPUPEncounters(encountercreate.getPatient());
                         Log.d("EncounterS.java", "syncEncounter Visits Data Signals");
                         if (callbackListener != null) {
                             callbackListener.onResponse();

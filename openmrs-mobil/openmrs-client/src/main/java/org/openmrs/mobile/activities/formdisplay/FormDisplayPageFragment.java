@@ -11,6 +11,8 @@
 package org.openmrs.mobile.activities.formdisplay;
 
 import android.annotation.TargetApi;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
@@ -18,11 +20,14 @@ import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.location.Location;
 import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.InputType;
@@ -49,6 +54,7 @@ import android.widget.Toast;
 import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
 import org.openmrs.mobile.R;
 import org.openmrs.mobile.activities.ACBaseFragment;
+import org.openmrs.mobile.activities.syncedpatients.SyncedPatientsActivity;
 import org.openmrs.mobile.application.OpenMRS;
 import org.openmrs.mobile.bluetooth.BleDefinedUUIDs;
 import org.openmrs.mobile.bluetooth.BleWrapper;
@@ -68,6 +74,8 @@ import org.openmrs.mobile.utilities.ToastUtil;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.content.Context.NOTIFICATION_SERVICE;
+
 public class FormDisplayPageFragment extends ACBaseFragment<FormDisplayContract.Presenter.PagePresenter> implements FormDisplayContract.View.PageView{
 
     public static final String CONCEPT_BMI_UUID = ApplicationConstants.ConceptUuids.BMI ;
@@ -85,6 +93,10 @@ public class FormDisplayPageFragment extends ACBaseFragment<FormDisplayContract.
     private ArrayList<Integer> mListSystolic,mListDiastolic,mListPulse;
     int mDiastolic,mSystolic, mPulse;
     private Context mContext;
+    private RangeEditText mLatitude;
+    private RangeEditText mLongitude;
+    long mPatientID;
+    Gps gps;
 
     public static FormDisplayPageFragment newInstance() {
         return new FormDisplayPageFragment();
@@ -102,6 +114,7 @@ public class FormDisplayPageFragment extends ACBaseFragment<FormDisplayContract.
         mListSystolic=new ArrayList<Integer>();
         mListPulse=new ArrayList<Integer>();
         mContext = super.getContext();
+       // notifyTreatment();
         return root;
     }
 
@@ -154,6 +167,28 @@ public class FormDisplayPageFragment extends ACBaseFragment<FormDisplayContract.
             inputFields.add(field);
         }
         sectionLinearLayout.addView(generateTextView(question.getLabel()));
+        if (question.getLabel().equalsIgnoreCase("Latitude")) {
+            mLatitude=ed;
+            gps = new Gps(this.mContext,new Gps.GPSListener() {
+
+                @Override
+                public void onGPSResult() {
+                    mLatitude.setText(String.valueOf(gps.getLatitude()));
+                }
+            } );
+            gps.makeMeasurement();
+        }
+        if (question.getLabel().equalsIgnoreCase("Longitude")) {
+            mLongitude=ed;
+            gps = new Gps(this.mContext,new Gps.GPSListener() {
+
+                @Override
+                public void onGPSResult() {
+                    mLongitude.setText(String.valueOf(gps.getLongitude()));
+                }
+            } );
+            gps.makeMeasurement();
+        }
         if (question.getLabel().equalsIgnoreCase("BMI (kg/m2):")) {
             TextView tv = new TextView(getActivity());
             tv.setId(field.getId());
@@ -196,10 +231,49 @@ public class FormDisplayPageFragment extends ACBaseFragment<FormDisplayContract.
                         updateBMI();
                     }
                 });
-            if (question.getLabel().contentEquals("BP:Systolic:"))
+            if (question.getLabel().contentEquals("BP:Systolic:")) {
                 mEditTextSystolic=ed;
+                mEditTextSystolic.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                        String value = s.toString();
+                       if (StringUtils.notEmpty(value) && Long.parseLong(value) >= 140) {
+                           notifyTreatment();
+                       }
+                    }
+                });
+            }
             if (question.getLabel().contentEquals("BP:Diastolic:")) {
                 mEditTextDiastolic = ed;
+                mEditTextDiastolic.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                        String value = s.toString();
+                        if (StringUtils.notEmpty(value) && Long.parseLong(value) >= 90) {
+                            notifyTreatment();
+                        }
+                    }
+                });
            }
             if (question.getLabel().contentEquals("Pulse(Rate/Min):")){
                     mEditTextPulseRate=ed;
@@ -708,7 +782,8 @@ public class FormDisplayPageFragment extends ACBaseFragment<FormDisplayContract.
         for( InputField field:inputFields) {
             String pes = inputFields.get(3).getValue();
             String altura = inputFields.get(4).getValue();
-            if (field.getConcept().equalsIgnoreCase(CONCEPT_BMI_UUID) && StringUtils.notEmpty(pes) && StringUtils.notEmpty(altura)) {
+            if (field.getConcept().equalsIgnoreCase(CONCEPT_BMI_UUID) &&
+                    StringUtils.notEmpty(pes) && StringUtils.notEmpty(altura)) {
                 Double pesD = Double.parseDouble(inputFields.get(3).getValue());
                 Double alturaD = Double.parseDouble(inputFields.get(4).getValue());
                 Double bmi = pesD * 100 * 100 / (alturaD * alturaD);
@@ -734,4 +809,30 @@ public class FormDisplayPageFragment extends ACBaseFragment<FormDisplayContract.
         }
     }
 
+    private void notifyTreatment() {
+        NotificationCompat.Builder mBuilder;
+        NotificationManager mNotifyMgr =(NotificationManager) mContext.
+                getApplicationContext().getSystemService(NOTIFICATION_SERVICE);
+
+        int icono = R.drawable.ic_openmrs;
+        PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, new Intent(), 0);
+
+        mBuilder =new NotificationCompat.Builder(mContext.getApplicationContext())
+                .setContentIntent(pendingIntent)
+                .setSmallIcon(icono)
+                .setContentTitle("High Blood Pressure")
+                .setContentText("Patient has high blood pressure")
+                .setVibrate(new long[] {100, 250, 100, 500})
+                .setAutoCancel(true);
+
+
+
+        mNotifyMgr.notify(1, mBuilder.build());
+
+    }
+
+
+
 }
+
+

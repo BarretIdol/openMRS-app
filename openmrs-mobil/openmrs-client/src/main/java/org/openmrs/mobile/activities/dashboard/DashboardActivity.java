@@ -21,8 +21,12 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.ApiException;
@@ -41,16 +45,27 @@ import com.google.android.gms.tasks.Task;
 import org.openmrs.mobile.R;
 import org.openmrs.mobile.activities.ACBaseActivity;
 import org.openmrs.mobile.activities.addeditpatient.AddEditPatientActivity;
+import org.openmrs.mobile.activities.lastviewedpatients.LastViewedPatientsActivity;
+import org.openmrs.mobile.activities.syncedpatients.SyncedPatientsActivity;
+import org.openmrs.mobile.activities.syncedpatients.SyncedPatientsFragment;
+import org.openmrs.mobile.activities.syncedpatients.SyncedPatientsPresenter;
+import org.openmrs.mobile.application.OpenMRS;
+import org.openmrs.mobile.utilities.ApplicationConstants;
+import org.openmrs.mobile.utilities.StringUtils;
 
 public class DashboardActivity extends ACBaseActivity {
     private static final  int REQUEST_CODE_ASK_PERMISSIONS = 1;
     private static final int REQUEST_CHECK_SETTINGS = 2;
-
+    private SearchView searchView;
+    private String query;
     /*TODO: Permission handling to be coded later, moving to SDK 22 for now.
     final private int REQUEST_CODE_ASK_PERMISSIONS = 123;
     Bundle currinstantstate;
     */
+    //Menu Items
+    private MenuItem mAddPatientMenuItem;
 
+    private SyncedPatientsPresenter mPresenter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -67,7 +82,7 @@ public class DashboardActivity extends ACBaseActivity {
         }
 
         // Create fragment
-        DashboardFragment dashboardFragment =
+        /*DashboardFragment dashboardFragment =
                 (DashboardFragment) getSupportFragmentManager().findFragmentById(R.id.dashboardContentFrame);
         if (dashboardFragment == null) {
             dashboardFragment = DashboardFragment.newInstance();
@@ -78,7 +93,28 @@ public class DashboardActivity extends ACBaseActivity {
         }
 
         // Create the presenter
-        new DashboardPresenter(dashboardFragment);
+        new DashboardPresenter(dashboardFragment);*/
+
+        SyncedPatientsFragment syncedPatientsFragment =
+                (SyncedPatientsFragment) getSupportFragmentManager().findFragmentById(R.id.dashboardContentFrame);
+        if (syncedPatientsFragment == null) {
+            syncedPatientsFragment = SyncedPatientsFragment.newInstance();
+        }
+        if (!syncedPatientsFragment.isActive()) {
+            addFragmentToActivity(getSupportFragmentManager(),
+                    syncedPatientsFragment, R.id.dashboardContentFrame);
+        }
+
+        // Create the presenter
+        //new DashboardPresenter(dashboardFragment);
+        // new SyncedPatientsPresenter(dashboardFragment);
+        if(savedInstanceState != null){
+            query = savedInstanceState.getString(ApplicationConstants.BundleKeys.PATIENT_QUERY_BUNDLE, "");
+            mPresenter = new SyncedPatientsPresenter(syncedPatientsFragment, query);
+        } else {
+            mPresenter = new SyncedPatientsPresenter(syncedPatientsFragment);
+        }
+
 
         if (Build.VERSION.SDK_INT >= 23) {
             // Marshmallow+
@@ -111,6 +147,7 @@ public class DashboardActivity extends ACBaseActivity {
         task.addOnSuccessListener(this, new OnSuccessListener<LocationSettingsResponse>() {
             @Override
             public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
+                // startNewActivity(SyncedPatientsActivity.class);
                 // All location settings are satisfied. The client can initialize
                 // location requests here.
             }
@@ -177,4 +214,90 @@ public class DashboardActivity extends ACBaseActivity {
         }
     }
 
+
+    /**
+     * Starts new Activity depending on which ImageView triggered it
+     */
+   /* private void startNewActivity(Class<? extends ACBaseActivity> clazz) {
+        Intent intent = new Intent(this, clazz);
+        startActivity(intent);
+    }*/
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(R.menu.find_locally_and_add_patients_menu, menu);
+
+        mAddPatientMenuItem = menu.findItem(R.id.actionAddPatients);
+        //enableAddPatient(OpenMRS.getInstance().getSyncState());
+        enableAddPatient(true);
+
+        // Search function
+        MenuItem searchMenuItem = menu.findItem(R.id.actionSearchLocal);
+        if (OpenMRS.getInstance().isRunningHoneycombVersionOrHigher()) {
+            searchView = (SearchView) searchMenuItem.getActionView();
+        } else {
+            searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
+        }
+        if(StringUtils.notEmpty(query)){
+            searchMenuItem.expandActionView();
+            searchView.setQuery(query, true);
+            searchView.clearFocus();
+        }
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                searchView.clearFocus();
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String query) {
+                mPresenter.setQuery(query);
+                mPresenter.updateLocalPatientsList();
+                return true;
+            }
+        });
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        super.onOptionsItemSelected(item);
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.syncbutton:
+               // enableAddPatient(OpenMRS.getInstance().getSyncState());
+                break;
+            case R.id.actionAddPatients:
+                Intent intent = new  Intent(this, AddEditPatientActivity.class);
+                // Intent intent = new Intent(this, LastViewedPatientsActivity.class);
+                startActivity(intent);
+                break;
+            case android.R.id.home:
+                onBackPressed();
+                break;
+            case R.id.actionSearchServer:
+                Intent i = new Intent(this, LastViewedPatientsActivity.class);
+                startActivity(i);
+            default:
+                // Do nothing
+                break;
+        }
+        return true;
+    }
+
+    private void enableAddPatient(boolean enabled) {
+        int resId = enabled ? R.drawable.ic_add : R.drawable.ic_add_disabled;
+        mAddPatientMenuItem.setEnabled(enabled);
+        mAddPatientMenuItem.setIcon(resId);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        String query = searchView.getQuery().toString();
+        outState.putString(ApplicationConstants.BundleKeys.PATIENT_QUERY_BUNDLE, query);
+    }
 }

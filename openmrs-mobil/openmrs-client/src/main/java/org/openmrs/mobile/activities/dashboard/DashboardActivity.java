@@ -229,7 +229,8 @@ public class DashboardActivity extends ACBaseActivity {
         getMenuInflater().inflate(R.menu.find_locally_and_add_patients_menu, menu);
 
         mAddPatientMenuItem = menu.findItem(R.id.actionAddPatients);
-        enableAddPatient(OpenMRS.getInstance().getSyncState());
+        //enableAddPatient(OpenMRS.getInstance().getSyncState());
+        enableAddPatient(true);
 
         // Search function
         MenuItem searchMenuItem = menu.findItem(R.id.actionSearchLocal);
@@ -267,15 +268,19 @@ public class DashboardActivity extends ACBaseActivity {
         int id = item.getItemId();
         switch (id) {
             case R.id.syncbutton:
-                enableAddPatient(OpenMRS.getInstance().getSyncState());
+               // enableAddPatient(OpenMRS.getInstance().getSyncState());
                 break;
             case R.id.actionAddPatients:
-                Intent intent = new Intent(this, LastViewedPatientsActivity.class);
+                Intent intent = new  Intent(this, AddEditPatientActivity.class);
+                // Intent intent = new Intent(this, LastViewedPatientsActivity.class);
                 startActivity(intent);
                 break;
             case android.R.id.home:
                 onBackPressed();
                 break;
+            case R.id.actionSearchServer:
+                Intent i = new Intent(this, LastViewedPatientsActivity.class);
+                startActivity(i);
             default:
                 // Do nothing
                 break;

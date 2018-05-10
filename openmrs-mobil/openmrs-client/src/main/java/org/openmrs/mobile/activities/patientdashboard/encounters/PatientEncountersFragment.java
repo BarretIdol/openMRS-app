@@ -28,6 +28,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import org.openmrs.mobile.R;
+import org.openmrs.mobile.activities.formlist.FormListActivity;
 import org.openmrs.mobile.activities.formview.FormViewActivity;
 import org.openmrs.mobile.activities.patientdashboard.PatientDashboardActivity;
 import org.openmrs.mobile.activities.patientdashboard.PatientDashboardContract;
@@ -69,6 +70,9 @@ public class PatientEncountersFragment extends PatientDashboardFragment implemen
         switch (id) {
             case R.id.actionStartVisit:
                 //((PatientDashboardEncountersPresenter) mPresenter).syncVisits();
+                Intent intent = new Intent(this.getActivity(), FormListActivity.class);
+                intent.putExtra(ApplicationConstants.BundleKeys.PATIENT_ID_BUNDLE, super.mPresenter.getPatientId());
+                startActivity(intent);
                 break;
             default:
                 // Do nothing

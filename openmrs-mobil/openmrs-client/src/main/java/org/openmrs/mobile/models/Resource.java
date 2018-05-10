@@ -56,7 +56,7 @@ public class Resource implements Serializable {
      *     The display
      */
     public String getDisplay() {
-        return display;
+        return display != null ? display : "";
     }
 
     /**

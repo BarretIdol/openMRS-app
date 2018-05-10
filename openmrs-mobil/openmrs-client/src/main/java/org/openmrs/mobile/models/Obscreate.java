@@ -93,7 +93,11 @@ public class Obscreate extends Model implements Serializable,ObservationMethods 
     }
     @Override
     public String getDisplay() {
-        return new ConceptDAO().findConceptsByUUID(concept).getDisplay();
+        Concept conceptTmp = new ConceptDAO().findConceptsByUUID(concept);
+        if (conceptTmp != null) {
+            return new ConceptDAO().findConceptsByUUID(concept).getDisplay();
+        }
+        return "";
     }
 
     @Override

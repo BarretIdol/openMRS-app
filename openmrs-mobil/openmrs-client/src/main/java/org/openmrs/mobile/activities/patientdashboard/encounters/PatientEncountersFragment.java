@@ -68,7 +68,8 @@ public class PatientEncountersFragment extends PatientDashboardFragment implemen
         int id = item.getItemId();
         switch (id) {
             case R.id.actionStartVisit:
-                //((PatientDashboardEncountersPresenter) mPresenter).syncVisits();
+                // ((PatientDashboardEncountersPresenter) mPresenter).syncVisits();
+                // ((PatientDashboardEncountersPresenter) mPresenter).startVisit();
                 break;
             default:
                 // Do nothing

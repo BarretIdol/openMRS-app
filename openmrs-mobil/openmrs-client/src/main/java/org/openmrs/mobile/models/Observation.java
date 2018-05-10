@@ -336,7 +336,12 @@ public class Observation extends Resource implements Serializable,ObservationMet
     }
     @Override
     public String getDisplay() {
-        return new ConceptDAO().findConceptsByUUID(this.getConceptUuid()).getDisplay();
+
+        Concept conceptsByUUID = new ConceptDAO().findConceptsByUUID(this.getConceptUuid());
+        if (conceptsByUUID != null) {
+            return conceptsByUUID.getDisplay();
+        }
+        return "";
     }
 
     @Override

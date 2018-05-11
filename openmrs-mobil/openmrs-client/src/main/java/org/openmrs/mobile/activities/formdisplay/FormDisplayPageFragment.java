@@ -683,8 +683,12 @@ public class FormDisplayPageFragment extends ACBaseFragment<FormDisplayContract.
     @Override
     public List<InputField> getInputFields() {
         for (InputField field : inputFields) {
-            String pes = inputFields.get(3).getValue();
-            String altura = inputFields.get(4).getValue();
+            String pes = "0";
+            String altura = "0";
+            if (inputFields.size()>3) {
+                 pes = inputFields.get(3).getValue();
+                 altura = inputFields.get(4).getValue();
+            }
             if (field.getConcept().equalsIgnoreCase(CONCEPT_BMI_UUID) && StringUtils.notEmpty(pes) && StringUtils.notEmpty(altura)) {
                 Double pesD = Double.parseDouble(pes);
                 Double alturaD =Double.parseDouble(altura);

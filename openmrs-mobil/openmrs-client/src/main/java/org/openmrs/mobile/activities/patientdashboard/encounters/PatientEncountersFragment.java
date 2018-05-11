@@ -59,6 +59,7 @@ public class PatientEncountersFragment extends PatientDashboardFragment implemen
         setHasOptionsMenu(true);
     }
 
+
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.patients_visit_tab_menu, menu);

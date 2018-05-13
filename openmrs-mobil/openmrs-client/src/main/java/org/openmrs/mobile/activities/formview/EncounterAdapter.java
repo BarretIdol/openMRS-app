@@ -94,7 +94,7 @@ public class EncounterAdapter extends RecyclerView.Adapter<EncounterAdapter.Enco
         public void assignData(Obscreate obs) {
             Concept concept = new ConceptDAO().findConceptsByUUID(obs.getConcept());
             obsname.setText(concept.getDisplay());
-            obsvalue.setText(obs.getValue());
+            obsvalue.setText(obs.getDisplayValue());
             textOptions(obs);
         }
     }

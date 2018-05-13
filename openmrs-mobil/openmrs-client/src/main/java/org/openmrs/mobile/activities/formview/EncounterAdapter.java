@@ -65,6 +65,7 @@ public class EncounterAdapter extends RecyclerView.Adapter<EncounterAdapter.Enco
         public EncounterData(View itemView) {
             super(itemView);
             obsname = (TextView) itemView.findViewById(R.id.obsname);
+            obsname.setEms(10);
             obsvalue = (TextView) itemView.findViewById(R.id.obsvalue);
         }
 

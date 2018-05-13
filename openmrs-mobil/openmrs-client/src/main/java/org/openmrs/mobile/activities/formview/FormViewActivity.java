@@ -38,6 +38,7 @@ public class FormViewActivity extends ACBaseActivity {
         mFormViewActivityPresenter.setAdapter(encID,sync);
 
     }
+
 }
  /* if (sync)
             adapter = new EncounterAdapter(observationDAO.findObservationByEncounterID(encID),null);

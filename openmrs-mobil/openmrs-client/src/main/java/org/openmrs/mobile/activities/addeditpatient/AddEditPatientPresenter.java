@@ -84,8 +84,8 @@ public class AddEditPatientPresenter extends BasePresenter implements AddEditPat
     @Override
     public void confirmRegister(Patient patient) {
         if(!registeringPatient && validate(patient)) {
-            mPatientInfoView.setProgressBarVisibility(true);
             mPatientInfoView.hideSoftKeys();
+            mPatientInfoView.setProgressBarVisibility(true);
             registeringPatient = true;
             findSimilarPatients(patient);
         }

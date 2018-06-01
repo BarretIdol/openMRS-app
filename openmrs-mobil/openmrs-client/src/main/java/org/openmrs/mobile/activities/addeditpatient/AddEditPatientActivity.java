@@ -39,7 +39,6 @@ import com.google.android.gms.tasks.Task;
 import org.openmrs.mobile.R;
 import org.openmrs.mobile.activities.ACBaseActivity;
 import org.openmrs.mobile.utilities.ApplicationConstants;
-import org.openmrs.mobile.utilities.ToastUtil;
 
 import java.util.Arrays;
 import java.util.List;

@@ -10,54 +10,29 @@
 
 package org.openmrs.mobile.activities.formdisplay;
 
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.SparseArray;
 
-import com.activeandroid.Model;
-
 import org.joda.time.LocalDateTime;
-import org.openmrs.mobile.R;
 import org.openmrs.mobile.activities.BasePresenter;
-import org.openmrs.mobile.activities.syncedpatients.SyncedPatientsActivity;
 import org.openmrs.mobile.api.EncounterService;
-import org.openmrs.mobile.api.RestApi;
-import org.openmrs.mobile.api.retrofit.VisitApi;
-import org.openmrs.mobile.dao.ConceptDAO;
-import org.openmrs.mobile.dao.EncounterDAO;
 import org.openmrs.mobile.dao.PatientDAO;
-import org.openmrs.mobile.dao.VisitDAO;
-import org.openmrs.mobile.dao.LocationDAO;
 import org.openmrs.mobile.listeners.retrofit.DefaultResponseCallbackListener;
-import org.openmrs.mobile.models.Encounter;
-import org.openmrs.mobile.models.EncounterType;
 import org.openmrs.mobile.models.Encountercreate;
 import org.openmrs.mobile.models.Obscreate;
-import org.openmrs.mobile.models.Observation;
 import org.openmrs.mobile.models.Patient;
-import org.openmrs.mobile.models.Visit;
-import org.openmrs.mobile.models.VisitType;
 import org.openmrs.mobile.utilities.ApplicationConstants;
-import org.openmrs.mobile.utilities.DateUtils;
-import org.openmrs.mobile.utilities.FormService;
-import org.openmrs.mobile.utilities.Gps;
 import org.openmrs.mobile.utilities.InputField;
-import org.openmrs.mobile.utilities.NetworkUtils;
 import org.openmrs.mobile.utilities.SelectOneField;
 import org.openmrs.mobile.utilities.ToastUtil;
-import org.openmrs.mobile.application.OpenMRS;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.Random;
-import java.util.UUID;
 
-import static android.content.Context.NOTIFICATION_SERVICE;
 import static org.openmrs.mobile.utilities.FormService.getFormResourceByName;
 
 public class FormDisplayMainPresenter extends BasePresenter implements FormDisplayContract.Presenter.MainPresenter {
@@ -68,6 +43,7 @@ public class FormDisplayMainPresenter extends BasePresenter implements FormDispl
     private FormDisplayContract.View.MainView mFormDisplayView;
     private Patient mPatient;
     private FormPageAdapter mPageAdapter;
+    private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm");
 
     public FormDisplayMainPresenter(FormDisplayContract.View.MainView mFormDisplayView, Bundle bundle, FormPageAdapter mPageAdapter) {
         this.mFormDisplayView = mFormDisplayView;
@@ -130,7 +106,8 @@ public class FormDisplayMainPresenter extends BasePresenter implements FormDispl
                     obscreate.setConcept(input.getConcept());
                     obscreate.setValue(String.valueOf(input.getValue()));
                     LocalDateTime localDateTime = new LocalDateTime();
-                    obscreate.setObsDatetime(localDateTime.toString());
+                    //obscreate.setObsDatetime(localDateTime.toString());
+                    obscreate.setObsDatetime(sdf.format(new Date()));
                     obscreate.setPerson(mPatient.getUuid());
                     observations.add(obscreate);
                 }
@@ -141,8 +118,9 @@ public class FormDisplayMainPresenter extends BasePresenter implements FormDispl
                     Obscreate obscreate = new Obscreate();
                     obscreate.setConcept(radioGroupField.getConcept());
                     obscreate.setValue(radioGroupField.getChosenAnswer().getConcept());
-                    LocalDateTime localDateTime = new LocalDateTime();
-                    obscreate.setObsDatetime(localDateTime.toString());
+//                    LocalDateTime localDateTime = new LocalDateTime();
+//                    obscreate.setObsDatetime(localDateTime.toString());
+                    obscreate.setObsDatetime(sdf.format(new Date()));
                     obscreate.setPerson(mPatient.getUuid());
                     observations.add(obscreate);
                 }

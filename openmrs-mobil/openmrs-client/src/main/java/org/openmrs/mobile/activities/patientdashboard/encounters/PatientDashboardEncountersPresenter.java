@@ -96,8 +96,8 @@ public class PatientDashboardEncountersPresenter extends PatientDashboardMainPre
                 }
             });
         }
-
     }
+
     @Override
     public void showStartVisitDialog() {
       /*  addSubscription(encounterDAO.getActiveVisitByPatientId(mPatient.getId())

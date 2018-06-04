@@ -76,6 +76,7 @@ public abstract class ApplicationConstants {
         public static final String PATIENTS_START_INDEX = "patientsStartIndex";
         public static final String ENCOUNTER_ID= "encounter_id";
         public static final java.lang.String ENCOUNTER_SYNC = "encounter_sync";
+        public static final String GO_TO_ENCOUNTER_TAB = "goToEncounterTab";
     }
 
     public abstract static class ServiceActions {

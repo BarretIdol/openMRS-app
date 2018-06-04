@@ -108,11 +108,13 @@ public class Encounter extends Resource implements Serializable,EncounterMethods
      *     The display
      */
     public String getDisplay() {
-        return display;
+        //return display;
+        return getFormName() + " " + DateUtils.convertTime(getEncounterDatetime(),DateUtils.DATE_WITH_TIME_FORMAT);
     }
 
     @Override
     public String getFormName() {
+
         return encounterType.getDisplay();
     }
 
@@ -122,6 +124,7 @@ public class Encounter extends Resource implements Serializable,EncounterMethods
      *     The display
      */
     public void setDisplay(String display) {
+
         this.display = display;
     }
 

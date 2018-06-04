@@ -14,6 +14,7 @@
 
 package org.openmrs.mobile.activities.patientdashboard;
 
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -45,6 +46,7 @@ public class PatientDashboardActivity extends ACBaseActivity {
 
     public PatientDashboardContract.PatientDashboardMainPresenter mPresenter;
     public PatientDashboardPagerAdapter mAdapter;
+    private boolean goToEncounterTab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +60,9 @@ public class PatientDashboardActivity extends ACBaseActivity {
             patientBundle = getIntent().getExtras();
         }
         mId = String.valueOf(patientBundle.get(ApplicationConstants.BundleKeys.PATIENT_ID_BUNDLE));
+        if (patientBundle.get(ApplicationConstants.BundleKeys.GO_TO_ENCOUNTER_TAB) != null) {
+            goToEncounterTab = patientBundle.getBoolean(ApplicationConstants.BundleKeys.GO_TO_ENCOUNTER_TAB);
+        }
         mAdapter = new PatientDashboardPagerAdapter(getSupportFragmentManager(), mId);
         initViewPager(mAdapter);
     }
@@ -101,6 +106,9 @@ public class PatientDashboardActivity extends ACBaseActivity {
         final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(tabHost);
+        if (goToEncounterTab) {
+            viewPager.setCurrentItem(2);
+        }
         tabHost.setOnTabChangeListener(new MaterialTabHost.OnTabChangeListener() {
             @Override
             public void onTabSelected(int position) {
@@ -138,6 +146,23 @@ public class PatientDashboardActivity extends ACBaseActivity {
         else if (fragment instanceof PatientChartsFragment){
             mPresenter = new PatientDashboardChartsPresenter(id,((PatientChartsFragment) fragment));
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PatientEncountersFragment.REQUEST_NEW_ENCOUNTER) {
+            this.finish();
+            openPatientDashboardActivity(Long.valueOf(mId));
+        }
+
+    }
+    // Reload activity to force update all data, new encounters added
+    private void openPatientDashboardActivity(Long patientId) {
+        Intent intent = new Intent(this, PatientDashboardActivity.class);
+        intent.putExtra(ApplicationConstants.BundleKeys.PATIENT_ID_BUNDLE, patientId);
+        intent.putExtra(ApplicationConstants.BundleKeys.GO_TO_ENCOUNTER_TAB, true);
+        startActivity(intent);
     }
 
 }

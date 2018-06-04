@@ -197,7 +197,8 @@ public class AddEditPatientFragment extends ACBaseFragment<AddEditPatientContrac
                         }
                     }
                 });
- }
+    }
+
     @Override
     public void finishPatientInfoActivity() {
         getActivity().finish();
@@ -218,43 +219,37 @@ public class AddEditPatientFragment extends ACBaseFragment<AddEditPatientContrac
                                     boolean genderError) {
         if (givenNameError) {
             fnameerror.setVisibility(View.VISIBLE);
-        }
-        else {
+        } else {
             fnameerror.setVisibility(View.INVISIBLE);
         }
 
         if (familyNameError) {
             lnameerror.setVisibility(View.VISIBLE);
-        }
-        else {
+        } else {
             lnameerror.setVisibility(View.INVISIBLE);
         }
 
         if (dayOfBirthError) {
             doberror.setVisibility(View.VISIBLE);
-        }
-        else {
+        } else {
             doberror.setVisibility(View.GONE);
         }
 
         if (addressError) {
             addrerror.setVisibility(View.VISIBLE);
-        }
-        else {
+        } else {
             addrerror.setVisibility(View.GONE);
         }
 
         if (countryError) {
             countryerror.setVisibility(View.VISIBLE);
-        }
-        else {
+        } else {
             countryerror.setVisibility(View.GONE);
         }
 
         if (genderError) {
             gendererror.setVisibility(View.VISIBLE);
-        }
-        else {
+        } else {
             gendererror.setVisibility(View.GONE);
         }
     }
@@ -280,19 +275,19 @@ public class AddEditPatientFragment extends ACBaseFragment<AddEditPatientContrac
         PersonName name = new PersonName();
         name.setFamilyName(ViewUtils.getInput(edlname));
         name.setGivenName(ViewUtils.getInput(edfname));
-       // name.setMiddleName(ViewUtils.getInput(edmname));
+        // name.setMiddleName(ViewUtils.getInput(edmname));
         List<PersonName> names = new ArrayList<>();
         names.add(name);
         person.setNames(names);
 
-        PersonAttribute personAttribute=new PersonAttribute();
+        PersonAttribute personAttribute = new PersonAttribute();
         personAttribute.setValue(edhclinic.getText().toString());
-        ArrayList<PersonAttribute> attributeArrayList=new ArrayList<PersonAttribute>();
+        ArrayList<PersonAttribute> attributeArrayList = new ArrayList<PersonAttribute>();
         attributeArrayList.add(personAttribute);
         //person.setAttributes(attributeArrayList);
 
         // Add gender
-        String[] genderChoices = {"M","F"};
+        String[] genderChoices = {"M", "F"};
         int index = gen.indexOfChild(getActivity().findViewById(gen.getCheckedRadioButtonId()));
         if (index != -1) {
             person.setGender(genderChoices[index]);
@@ -303,10 +298,10 @@ public class AddEditPatientFragment extends ACBaseFragment<AddEditPatientContrac
         // Add birthdate
         String birthdate = null;
         DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern(DateUtils.OPEN_MRS_REQUEST_PATIENT_FORMAT);
-        if(ViewUtils.isEmpty(eddob)) {
+        if (ViewUtils.isEmpty(eddob)) {
             if (!StringUtils.isBlank(ViewUtils.getInput(edyr)) || !StringUtils.isBlank(ViewUtils.getInput(edmonth))) {
-                int yeardiff = ViewUtils.isEmpty(edyr)? 0 : Integer.parseInt(edyr.getText().toString());
-                int mondiff = ViewUtils.isEmpty(edmonth)? 0 : Integer.parseInt(edmonth.getText().toString());
+                int yeardiff = ViewUtils.isEmpty(edyr) ? 0 : Integer.parseInt(edyr.getText().toString());
+                int mondiff = ViewUtils.isEmpty(edmonth) ? 0 : Integer.parseInt(edmonth.getText().toString());
                 LocalDate now = new LocalDate();
                 bdt = now.toDateTimeAtStartOfDay().toDateTime();
                 bdt = bdt.minusYears(yeardiff);
@@ -314,9 +309,8 @@ public class AddEditPatientFragment extends ACBaseFragment<AddEditPatientContrac
                 person.setBirthdateEstimated(true);
                 birthdate = dateTimeFormatter.print(bdt);
             }
-        }
-        else {
-            DateTime aux=convertDataTime(bdt);
+        } else {
+            DateTime aux = convertDataTime(bdt);
             birthdate = dateTimeFormatter.print(aux);
         }
         person.setBirthdate(birthdate);
@@ -329,12 +323,12 @@ public class AddEditPatientFragment extends ACBaseFragment<AddEditPatientContrac
 
     private DateTime convertDataTime(DateTime dt) {
         Chronology chronoeth = EthiopicChronology.getInstanceUTC();
-        Chronology greg=GregorianChronology.getInstanceUTC();
-        LocalDate ldEth=new LocalDate(dt.year().get(),dt.monthOfYear().get(),dt.dayOfMonth().get(),chronoeth);
-        LocalDate ldGreg=new LocalDate(ldEth.toDateTimeAtStartOfDay(),greg);
+        Chronology greg = GregorianChronology.getInstanceUTC();
+        LocalDate ldEth = new LocalDate(dt.year().get(), dt.monthOfYear().get(), dt.dayOfMonth().get(), chronoeth);
+        LocalDate ldGreg = new LocalDate(ldEth.toDateTimeAtStartOfDay(), greg);
         //Log.d("convertDataTime.java", "greg"+ldGreg.toString());
         //Log.d("convertDataTime.java", "eth"+ldEth.toString());
-        DateTime aux=ldGreg.toDateTimeAtStartOfDay();
+        DateTime aux = ldGreg.toDateTimeAtStartOfDay();
         //Log.d("convertDataTime.java", "dt"+aux);
         return aux;
     }
@@ -357,9 +351,10 @@ public class AddEditPatientFragment extends ACBaseFragment<AddEditPatientContrac
         if (view == null) {
             view = new View(this.getActivity());
         }
-        InputMethodManager inputMethodManager = (InputMethodManager)this.getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        InputMethodManager inputMethodManager = (InputMethodManager) this.getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
+
     @Override
     public void setProgressBarVisibility(boolean visibility) {
         relativeProgress.setVisibility(visibility ? View.VISIBLE : View.GONE);
@@ -367,7 +362,7 @@ public class AddEditPatientFragment extends ACBaseFragment<AddEditPatientContrac
     }
 
     @Override
-    public void showSimilarPatientDialog(List<Patient> patients, Patient newPatient){
+    public void showSimilarPatientDialog(List<Patient> patients, Patient newPatient) {
         setProgressBarVisibility(false);
         CustomDialogBundle similarPatientsDialog = new CustomDialogBundle();
         similarPatientsDialog.setTitleViewMessage(getString(R.string.similar_patients_dialog_title));
@@ -388,13 +383,13 @@ public class AddEditPatientFragment extends ACBaseFragment<AddEditPatientContrac
         String valueRef = "";
         for (FormResource f : FormService.getFormResourceByName(EncounterType.PERSONAL_DATA).getResourceList()) { //in case in the future we add formResources
             if (f.getName().equals("json"))
-               valueRef = f.getValueReference();
+                valueRef = f.getValueReference();
         }
         if (StringUtils.notEmpty(valueRef)) {
-        intent.putExtra(ApplicationConstants.BundleKeys.VALUEREFERENCE, valueRef);
-        intent.putExtra(ApplicationConstants.BundleKeys.ENCOUNTERTYPE, EncounterType.PERSONAL_DATA);
-        startActivity(intent);}
-        else {
+            intent.putExtra(ApplicationConstants.BundleKeys.VALUEREFERENCE, valueRef);
+            intent.putExtra(ApplicationConstants.BundleKeys.ENCOUNTERTYPE, EncounterType.PERSONAL_DATA);
+            startActivity(intent);
+        } else {
             ToastUtil.error("There is no json resource for Form " + EncounterType.PERSONAL_DATA);
         }
        /* Intent intent = new Intent(getActivity(), PatientDashboardActivity.class);
@@ -412,30 +407,30 @@ public class AddEditPatientFragment extends ACBaseFragment<AddEditPatientContrac
     }
 
     private void resolveViews(View v) {
-        linearLayout = (LinearLayout)v.findViewById(R.id.addEditLinearLayout);
+        linearLayout = (LinearLayout) v.findViewById(R.id.addEditLinearLayout);
         edfname = (EditText) v.findViewById(R.id.firstname);
-       // edmname = (EditText) v.findViewById(R.id.middlename);
-        edhclinic=(EditText)v.findViewById(R.id.numberHistory);
+        // edmname = (EditText) v.findViewById(R.id.middlename);
+        edhclinic = (EditText) v.findViewById(R.id.numberHistory);
         edlname = (EditText) v.findViewById(R.id.surname);
-        eddob = (EditText)v.findViewById(R.id.dob);
-        edyr = (EditText)v.findViewById(R.id.estyr);
-        edmonth = (EditText)v.findViewById(R.id.estmonth);
-        edaddr1 = (EditText)v.findViewById(R.id.addr1);
-       // edaddr2 = (EditText)v.findViewById(R.id.addr2);
-        edcity = (EditText)v.findViewById(R.id.city);
+        eddob = (EditText) v.findViewById(R.id.dob);
+        edyr = (EditText) v.findViewById(R.id.estyr);
+        edmonth = (EditText) v.findViewById(R.id.estmonth);
+        edaddr1 = (EditText) v.findViewById(R.id.addr1);
+        // edaddr2 = (EditText)v.findViewById(R.id.addr2);
+        edcity = (EditText) v.findViewById(R.id.city);
         edstate = (AutoCompleteTextView) v.findViewById(R.id.state);
         edcountry = (AutoCompleteTextView) v.findViewById(R.id.country);
-        edpostal = (EditText)v.findViewById(R.id.postal);
+        edpostal = (EditText) v.findViewById(R.id.postal);
 
-        gen = (RadioGroup)v.findViewById(R.id.gender);
-        progressBar = (ProgressBar)v.findViewById(R.id.progress_bar);
+        gen = (RadioGroup) v.findViewById(R.id.gender);
+        progressBar = (ProgressBar) v.findViewById(R.id.progress_bar);
 
-        fnameerror = (TextView)v.findViewById(R.id.fnameerror);
-        lnameerror = (TextView)v.findViewById(R.id.lnameerror);
-        doberror = (TextView)v.findViewById(R.id.doberror);
-        gendererror = (TextView)v.findViewById(R.id.gendererror);
-        addrerror = (TextView)v.findViewById(R.id.addrerror);
-        countryerror = (TextView)v.findViewById(R.id.countryerror);
+        fnameerror = (TextView) v.findViewById(R.id.fnameerror);
+        lnameerror = (TextView) v.findViewById(R.id.lnameerror);
+        doberror = (TextView) v.findViewById(R.id.doberror);
+        gendererror = (TextView) v.findViewById(R.id.gendererror);
+        addrerror = (TextView) v.findViewById(R.id.addrerror);
+        countryerror = (TextView) v.findViewById(R.id.countryerror);
 
         submitConfirm = (Button) v.findViewById(R.id.submitConfirm);
         capturePhotoBtn = (FloatingActionButton) v.findViewById(R.id.capture_photo);
@@ -444,7 +439,7 @@ public class AddEditPatientFragment extends ACBaseFragment<AddEditPatientContrac
     }
 
     private void fillFields(final Patient patient) {
-        if(patient != null && patient.getPerson() != null) {
+        if (patient != null && patient.getPerson() != null) {
             //Change to Update Patient Form
             String updatePatientStr = getResources().getString(R.string.action_update_patient_data);
             this.getActivity().setTitle(updatePatientStr);
@@ -458,7 +453,7 @@ public class AddEditPatientFragment extends ACBaseFragment<AddEditPatientContrac
 
             Person person = patient.getPerson();
             edfname.setText(person.getName().getGivenName());
-          //  edmname.setText(person.getName().getMiddleName());
+            //  edmname.setText(person.getName().getMiddleName());
             edlname.setText(person.getName().getFamilyName());
 
             patientName = person.getName().getNameString();
@@ -477,21 +472,20 @@ public class AddEditPatientFragment extends ACBaseFragment<AddEditPatientContrac
 
             edaddr1.setText(person.getAddress().getAddress1());//KEBELE
             edhclinic.setText(person.getAddress().getAddress2());//MedicalRecord
-          //  edaddr2.setText(person.getAddress().getAddress2());
+            //  edaddr2.setText(person.getAddress().getAddress2());
             edcity.setText(person.getAddress().getCityVillage()); // GODE
             edstate.setText(person.getAddress().getStateProvince()); //WAREDA
             edcountry.setText(person.getAddress().getCountry());
-           edpostal.setText(person.getAddress().getPostalCode());
+            edpostal.setText(person.getAddress().getPostalCode());
             if (patient.getPerson().getPhoto() != null) {
                 patientPhoto = patient.getPerson().getPhoto();
                 resizedPatientPhoto = patient.getPerson().getResizedPhoto();
                 patientImageView.setImageBitmap(resizedPatientPhoto);
             }
-            if(person.getAttributes().size()>0)
-            edhclinic.setText((person.getAttributes().get(0).getValue()));
+            if (person.getAttributes().size() > 0)
+                edhclinic.setText((person.getAttributes().get(0).getValue()));
         }
     }
-
 
 
     private void addSuggestionsToAutoCompleTextView() {
@@ -501,17 +495,18 @@ public class AddEditPatientFragment extends ACBaseFragment<AddEditPatientContrac
         edcountry.setAdapter(adapter);
 
     }
-    private void addSuggestionsToCities(){
-        String country_name = edcountry.getText().toString() ;
-        country_name = country_name.replace("(","");
-        country_name = country_name.replace(")","");
-        country_name = country_name.replace(" ","");
-        country_name = country_name.replace("-","_");
-        country_name = country_name.replace(".","");
-        country_name = country_name.replace("'","");
-        int resourceId = this.getResources().getIdentifier(country_name.toLowerCase(),"array",getContext().getPackageName());
-        if ( resourceId != 0 ) {
-            String[] states =  getContext().getResources().getStringArray(resourceId);
+
+    private void addSuggestionsToCities() {
+        String country_name = edcountry.getText().toString();
+        country_name = country_name.replace("(", "");
+        country_name = country_name.replace(")", "");
+        country_name = country_name.replace(" ", "");
+        country_name = country_name.replace("-", "_");
+        country_name = country_name.replace(".", "");
+        country_name = country_name.replace("'", "");
+        int resourceId = this.getResources().getIdentifier(country_name.toLowerCase(), "array", getContext().getPackageName());
+        if (resourceId != 0) {
+            String[] states = getContext().getResources().getStringArray(resourceId);
             ArrayAdapter<String> state_adapter = new ArrayAdapter<>(getContext(),
                     android.R.layout.simple_dropdown_item_1line, states);
             edstate.setAdapter(state_adapter);
@@ -574,7 +569,7 @@ public class AddEditPatientFragment extends ACBaseFragment<AddEditPatientContrac
                     DatePickerDialog mDatePicker = new DatePickerDialog(AddEditPatientFragment.this.getActivity(), new DatePickerDialog.OnDateSetListener() {
                         public void onDateSet(DatePicker datepicker, int selectedyear, int selectedmonth, int selectedday) {
                             int adjustedMonth = selectedmonth + 1;
-                            eddob.setText(selectedday+"/"+adjustedMonth+"/"+selectedyear);
+                            eddob.setText(selectedday + "/" + adjustedMonth + "/" + selectedyear);
                             birthdate = new LocalDate(selectedyear, adjustedMonth, selectedday);
                             bdt = birthdate.toDateTimeAtStartOfDay().toDateTime();
                         }
@@ -592,27 +587,26 @@ public class AddEditPatientFragment extends ACBaseFragment<AddEditPatientContrac
 
                 CameraOrGalleryPickerDialog dialog = CameraOrGalleryPickerDialog.getInstance(
                         new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
 
-                        if (which == 0)
-                            AddEditPatientFragmentPermissionsDispatcher.capturePhotoWithCheck(AddEditPatientFragment.this);
-                        else {
-                            Intent i;
-                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT)
-                                i = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-                            else
-                                i = new Intent(Intent.ACTION_GET_CONTENT);
-                            i.addCategory(Intent.CATEGORY_OPENABLE);
-                            i.setType("image/*");
-                            startActivityForResult(i, GALLERY_IMAGE_REQUEST);
-                        }
-                    }
-                });
+                                if (which == 0)
+                                    AddEditPatientFragmentPermissionsDispatcher.capturePhotoWithCheck(AddEditPatientFragment.this);
+                                else {
+                                    Intent i;
+                                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT)
+                                        i = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                                    else
+                                        i = new Intent(Intent.ACTION_GET_CONTENT);
+                                    i.addCategory(Intent.CATEGORY_OPENABLE);
+                                    i.setType("image/*");
+                                    startActivityForResult(i, GALLERY_IMAGE_REQUEST);
+                                }
+                            }
+                        });
                 dialog.show(getChildFragmentManager(), null);
             }
         });
-
 
 
         submitConfirm.setOnClickListener(new View.OnClickListener() {
@@ -677,7 +671,7 @@ public class AddEditPatientFragment extends ACBaseFragment<AddEditPatientContrac
                 .show();
     }
 
-    private Snackbar createSnackbarLong(int stringId){
+    private Snackbar createSnackbarLong(int stringId) {
         Snackbar snackbar = Snackbar.make(linearLayout, stringId, Snackbar.LENGTH_LONG);
         View sbView = snackbar.getView();
         TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
@@ -689,7 +683,7 @@ public class AddEditPatientFragment extends ACBaseFragment<AddEditPatientContrac
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.d("getGPSData.java", "onActivityResult frag");
 
-        if (requestCode == IMAGE_REQUEST){
+        if (requestCode == IMAGE_REQUEST) {
             if (resultCode == Activity.RESULT_OK) {
                 patientPhoto = getResizedPortraitImage(output.getPath());
                 Bitmap bitmap = ThumbnailUtils.extractThumbnail(patientPhoto, patientImageView.getWidth(), patientImageView.getHeight());

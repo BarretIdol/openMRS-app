@@ -6,7 +6,7 @@ http://www.androprogrammer.com/2015/06/view-pager-with-circular-indicator.html*/
  * v. 2.0. If a copy of the MPL was not distributed with this file, You can
  * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
  * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
- *
+ * <p>
  * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
  * graphic logo is a trademark of OpenMRS Inc.
  */
@@ -63,14 +63,12 @@ public class FormDisplayActivity extends ACBaseActivity implements FormDisplayCo
 
         Bundle bundle = getIntent().getExtras();
         String valuereference = null;
-        if(bundle!=null) {
-            valuereference = (String)bundle.get(ApplicationConstants.BundleKeys.VALUEREFERENCE);
+        if (bundle != null) {
+            valuereference = (String) bundle.get(ApplicationConstants.BundleKeys.VALUEREFERENCE);
             String formName = (String) bundle.get(ApplicationConstants.BundleKeys.FORM_NAME);
             getSupportActionBar().setTitle(formName + " Form");
         }
-
-
-            initViewComponents(valuereference);
+        initViewComponents(valuereference);
     }
 
     @Override
@@ -92,7 +90,7 @@ public class FormDisplayActivity extends ACBaseActivity implements FormDisplayCo
     }
 
     @Override
-    public void onAttachFragment (Fragment fragment) {
+    public void onAttachFragment(Fragment fragment) {
         attachPresenterToFragment(fragment);
         super.onAttachFragment(fragment);
     }
@@ -102,14 +100,14 @@ public class FormDisplayActivity extends ACBaseActivity implements FormDisplayCo
             Bundle bundle = getIntent().getExtras();
             String valueRef = null;
             ArrayList<FormFieldsWrapper> formFieldsWrappers = null;
-            if(bundle!=null) {
-                valueRef = (String)bundle.get(ApplicationConstants.BundleKeys.VALUEREFERENCE);
+            if (bundle != null) {
+                valueRef = (String) bundle.get(ApplicationConstants.BundleKeys.VALUEREFERENCE);
                 formFieldsWrappers = bundle.getParcelableArrayList(ApplicationConstants.BundleKeys.FORM_FIELDS_LIST_BUNDLE);
             }
             Form form = FormService.getForm(valueRef);
             List<Page> pageList = form.getPages();
             for (Page page : pageList) {
-                if(formFieldsWrappers != null){
+                if (formFieldsWrappers != null) {
                     new FormDisplayPagePresenter((FormDisplayPageFragment) fragment, page, formFieldsWrappers.get(pageList.indexOf(page)));
                 } else {
                     new FormDisplayPagePresenter((FormDisplayPageFragment) fragment, pageList.get(getFragmentNumber(fragment)));
@@ -138,7 +136,7 @@ public class FormDisplayActivity extends ACBaseActivity implements FormDisplayCo
         mBtnNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mViewPager.setCurrentItem(mViewPager.getCurrentItem()+1);
+                mViewPager.setCurrentItem(mViewPager.getCurrentItem() + 1);
             }
         });
         mBtnFinish.setOnClickListener(new View.OnClickListener() {
@@ -155,9 +153,9 @@ public class FormDisplayActivity extends ACBaseActivity implements FormDisplayCo
             @Override
             public void onPageSelected(int position) {
                 for (int i = 0; i < mDotsCount; i++) {
-                    mDots[i].setImageDrawable(ContextCompat.getDrawable(getBaseContext(),R.drawable.nonselecteditem_dot));
+                    mDots[i].setImageDrawable(ContextCompat.getDrawable(getBaseContext(), R.drawable.nonselecteditem_dot));
                 }
-                mDots[position].setImageDrawable(ContextCompat.getDrawable(getBaseContext(),R.drawable.selecteditem_dot));
+                mDots[position].setImageDrawable(ContextCompat.getDrawable(getBaseContext(), R.drawable.selecteditem_dot));
 
                 if (position + 1 == mDotsCount) {
                     mBtnNext.setVisibility(View.GONE);
@@ -167,10 +165,12 @@ public class FormDisplayActivity extends ACBaseActivity implements FormDisplayCo
                     mBtnFinish.setVisibility(View.GONE);
                 }
             }
+
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                 // This method is intentionally empty
             }
+
             @Override
             public void onPageScrollStateChanged(int state) {
                 // This method is intentionally empty
@@ -194,7 +194,7 @@ public class FormDisplayActivity extends ACBaseActivity implements FormDisplayCo
             pagerIndicator.addView(mDots[i], params);
         }
         mDots[0].setImageDrawable(ContextCompat.getDrawable(this, R.drawable.selecteditem_dot));
-        if(mDotsCount ==1) {
+        if (mDotsCount == 1) {
             mBtnNext.setVisibility(View.GONE);
             mBtnFinish.setVisibility(View.VISIBLE);
         }

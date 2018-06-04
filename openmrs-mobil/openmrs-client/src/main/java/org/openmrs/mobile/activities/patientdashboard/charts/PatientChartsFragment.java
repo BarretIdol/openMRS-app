@@ -51,6 +51,7 @@ public class PatientChartsFragment extends PatientDashboardFragment implements P
 
     private ExpandableListView mExpandableListView;
     private TextView mEmptyListView;
+    private int lastExpandedPosition = -1;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -107,7 +108,8 @@ public class PatientChartsFragment extends PatientDashboardFragment implements P
         encounterMethods.addAll(new PatientDAO().findPatientByID(String.valueOf
                 (mPresenter.getPatientId())).getEncountercreates());
                 for (EncounterMethods encounter : encounterMethods) {
-                    String datetime = DateUtils.convertTime(encounter.getEncounterDatetime());
+                    //String datetime = DateUtils.convertTime(encounter.getEncounterDatetime());
+                    String datetime = DateUtils.convertTime(encounter.getEncounterDatetime(), DateUtils.DATE_WITH_TIME_FORMAT);
                     String encounterTypeDisplay = encounter.getFormName();
                     if (displayableEncounterTypesArray.contains(encounterTypeDisplay)) {
                         for (ObservationMethods obs : encounter.getObservationsMethods()) {
@@ -175,6 +177,17 @@ public class PatientChartsFragment extends PatientDashboardFragment implements P
             VitalsListAdapter vitalsListAdapter = new VitalsListAdapter(this.getActivity(), observationList);
             mExpandableListView.setAdapter(vitalsListAdapter);
             mExpandableListView.setGroupIndicator(null);
+            mExpandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
+
+                @Override
+                public void onGroupExpand(int groupPosition) {
+                    if (lastExpandedPosition != -1
+                            && groupPosition != lastExpandedPosition) {
+                        mExpandableListView.collapseGroup(lastExpandedPosition);
+                    }
+                    lastExpandedPosition = groupPosition;
+                }
+            });
         //}
 
 

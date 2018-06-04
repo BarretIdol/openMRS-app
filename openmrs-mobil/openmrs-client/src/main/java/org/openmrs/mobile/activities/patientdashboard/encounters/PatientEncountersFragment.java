@@ -47,6 +47,7 @@ public class PatientEncountersFragment extends PatientDashboardFragment implemen
     public Encounter enc;
 
     public static final int REQUEST_CODE_FOR_VISIT = 1;
+    public static final int REQUEST_NEW_ENCOUNTER = 2;
 
     public static PatientEncountersFragment newInstance() {
         return new PatientEncountersFragment();
@@ -75,7 +76,8 @@ public class PatientEncountersFragment extends PatientDashboardFragment implemen
                 //((PatientDashboardEncountersPresenter) mPresenter).syncVisits();
                 Intent intent = new Intent(this.getActivity(), FormListActivity.class);
                 intent.putExtra(ApplicationConstants.BundleKeys.PATIENT_ID_BUNDLE, super.mPresenter.getPatientId());
-                startActivity(intent);
+                getActivity().startActivityForResult(intent, REQUEST_NEW_ENCOUNTER);
+                // startActivity(intent);
                 break;
             default:
                 // Do nothing

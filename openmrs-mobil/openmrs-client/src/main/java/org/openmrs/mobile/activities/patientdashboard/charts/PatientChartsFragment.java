@@ -16,6 +16,7 @@ package org.openmrs.mobile.activities.patientdashboard.charts;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -103,92 +104,92 @@ public class PatientChartsFragment extends PatientDashboardFragment implements P
         final HashSet<String> displayableEncounterTypesArray =
                 new HashSet<>(Arrays.asList(displayableEncounterTypes));
         JSONObject observationList = new JSONObject();
-        List <EncounterMethods> encounterMethods = new ArrayList<EncounterMethods>();
+        List<EncounterMethods> encounterMethods = new ArrayList<EncounterMethods>();
         encounterMethods.addAll(encounters);
         encounterMethods.addAll(new PatientDAO().findPatientByID(String.valueOf
                 (mPresenter.getPatientId())).getEncountercreates());
-                for (EncounterMethods encounter : encounterMethods) {
-                    //String datetime = DateUtils.convertTime(encounter.getEncounterDatetime());
-                    String datetime = DateUtils.convertTime(encounter.getEncounterDatetime(), DateUtils.DATE_WITH_TIME_FORMAT);
-                    String encounterTypeDisplay = encounter.getFormName();
-                    if (displayableEncounterTypesArray.contains(encounterTypeDisplay)) {
-                        for (ObservationMethods obs : encounter.getObservationsMethods()) {
-                            if (obs.getConceptUuid().equals(ApplicationConstants.ConceptUuids.BMI) ||
-                                    obs.getConceptUuid().equals(ApplicationConstants.ConceptUuids.DIASTOLIC)
-                                    || obs.getConceptUuid().equals(ApplicationConstants.ConceptUuids.SYSTOLIC) ||
-                                    obs.getConceptUuid().equals(ApplicationConstants.ConceptUuids.PULSE)) {
-                                String observationLabel = obs.getDisplay();
-                                if (observationLabel.contains(":")) {
-                                    observationLabel = observationLabel.substring(0, observationLabel.indexOf(':'));
+        for (EncounterMethods encounter : encounterMethods) {
+            //String datetime = DateUtils.convertTime(encounter.getEncounterDatetime());
+            String datetime = DateUtils.convertTime(encounter.getEncounterDatetime(), DateUtils.DATE_WITH_TIME_FORMAT);
+            String encounterTypeDisplay = encounter.getFormName();
+            if (displayableEncounterTypesArray.contains(encounterTypeDisplay)) {
+                for (ObservationMethods obs : encounter.getObservationsMethods()) {
+                    if (obs.getConceptUuid().equals(ApplicationConstants.ConceptUuids.BMI) ||
+                            obs.getConceptUuid().equals(ApplicationConstants.ConceptUuids.DIASTOLIC)
+                            || obs.getConceptUuid().equals(ApplicationConstants.ConceptUuids.SYSTOLIC) ||
+                            obs.getConceptUuid().equals(ApplicationConstants.ConceptUuids.PULSE)) {
+                        String observationLabel = obs.getDisplay();
+                        if (observationLabel.contains(":")) {
+                            observationLabel = observationLabel.substring(0, observationLabel.indexOf(':'));
+                        }
+                        if (observationList.has(observationLabel)) {
+                            JSONObject chartData = null;
+                            try {
+                                chartData = observationList.getJSONObject(observationLabel);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            if (chartData.has(datetime)) {
+                                JSONArray obsValue = null;
+                                try {
+                                    obsValue = chartData.getJSONArray(datetime);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
                                 }
-                                if (observationList.has(observationLabel)) {
-                                    JSONObject chartData = null;
-                                    try {
-                                        chartData = observationList.getJSONObject(observationLabel);
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-                                    if (chartData.has(datetime)) {
-                                        JSONArray obsValue = null;
-                                        try {
-                                            obsValue = chartData.getJSONArray(datetime);
-                                        } catch (JSONException e) {
-                                            e.printStackTrace();
-                                        }
-                                        obsValue.put(obs.getDisplayValue());
-                                        try {
-                                            chartData.put(datetime, obsValue);
-                                        } catch (JSONException e) {
-                                            e.printStackTrace();
-                                        }
-                                    } else {
-                                        JSONArray obsValue = new JSONArray();
-                                        obsValue.put(obs.getDisplayValue());
-                                        try {
-                                            chartData.put(datetime, obsValue);
-                                        } catch (JSONException e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-
-                                } else {
-                                    JSONObject chartData = new JSONObject();
-                                    JSONArray obsValue = new JSONArray();
-                                    obsValue.put(obs.getDisplayValue());
-                                    try {
-                                        chartData.put(datetime, obsValue);
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-                                    try {
-                                        observationList.put(observationLabel, chartData);
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-
+                                obsValue.put(obs.getDisplayValue());
+                                try {
+                                    chartData.put(datetime, obsValue);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            } else {
+                                JSONArray obsValue = new JSONArray();
+                                obsValue.put(obs.getDisplayValue());
+                                try {
+                                    chartData.put(datetime, obsValue);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
                                 }
                             }
+
+                        } else {
+                            JSONObject chartData = new JSONObject();
+                            JSONArray obsValue = new JSONArray();
+                            obsValue.put(obs.getDisplayValue());
+                            try {
+                                chartData.put(datetime, obsValue);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            try {
+                                observationList.put(observationLabel, chartData);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
                         }
                     }
                 }
-           // }
+            }
+        }
+        // }
 
 
-            VitalsListAdapter vitalsListAdapter = new VitalsListAdapter(this.getActivity(), observationList);
-            mExpandableListView.setAdapter(vitalsListAdapter);
-            mExpandableListView.setGroupIndicator(null);
-            mExpandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
+        VitalsListAdapter vitalsListAdapter = new VitalsListAdapter(this.getActivity(), observationList);
+        mExpandableListView.setAdapter(vitalsListAdapter);
+        mExpandableListView.setGroupIndicator(null);
+/*        mExpandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
 
-                @Override
-                public void onGroupExpand(int groupPosition) {
-                    if (lastExpandedPosition != -1
-                            && groupPosition != lastExpandedPosition) {
-                        mExpandableListView.collapseGroup(lastExpandedPosition);
-                    }
-                    lastExpandedPosition = groupPosition;
+            @Override
+            public void onGroupExpand(int groupPosition) {
+                if (lastExpandedPosition != -1
+                        && groupPosition != lastExpandedPosition) {
+                    mExpandableListView.collapseGroup(lastExpandedPosition);
                 }
-            });
-        //}
+                lastExpandedPosition = groupPosition;
+            }
+        });
+        //}*/
 
 
     }

@@ -16,6 +16,7 @@ package org.openmrs.mobile.activities.patientdashboard.charts;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -63,8 +64,8 @@ public class VitalsListAdapter extends BaseExpandableListAdapter {
     }
 
 
-    private List<ViewGroup> generateChildLayouts() {
-        List<ViewGroup> layouts = new ArrayList<ViewGroup>();
+    /*private List<ViewGroup> generateChildLayouts() {
+        List<ViewGroup> layouts = new ArrayList<>();
         LayoutInflater inflater = LayoutInflater.from(mContext);
 
         for (String vitalName : this.mVitalNameList) {
@@ -74,9 +75,10 @@ public class VitalsListAdapter extends BaseExpandableListAdapter {
                 Iterator<String> dates = chartData.keys();
                 ArrayList<String> dateList = Lists.newArrayList(dates);
                 //Sorting the date
-                Collections.sort(dateList, new Comparator<String>() {
+                *//*Collections.sort(dateList, new Comparator<String>() {
                     @Override
                     public int compare(String lhs, String rhs) {
+                        Log.d("chart dates: ", DateUtils.getDateFromString(lhs, DateUtils.DATE_WITH_TIME_FORMAT).getTime() + "-----" + DateUtils.getDateFromString(rhs, DateUtils.DATE_WITH_TIME_FORMAT).getTime());
                         if (DateUtils.getDateFromString(lhs).getTime() < DateUtils.getDateFromString(rhs).getTime())
                             return -1;
                         else if (DateUtils.getDateFromString(lhs).getTime() == DateUtils.getDateFromString(rhs).getTime())
@@ -84,18 +86,21 @@ public class VitalsListAdapter extends BaseExpandableListAdapter {
                         else
                             return 1;
                     }
-                });
+                });*//*
+                Collections.sort(dateList);
+
                 for (Integer j = 0; j < dateList.size(); j++) {
+                    Log.d("VITALS", chartData.toString() + "-Searching: " + dateList.get(j));
                     JSONArray dataArray = chartData.getJSONArray(dateList.get(j));
                     LineChart chart = (LineChart) convertView.findViewById(R.id.linechart);
-                    List<Entry> entries = new ArrayList<Entry>();
+                    List<Entry> entries = new ArrayList<>();
                     for (Integer i = 0; i < dataArray.length(); i++) {
                         entries.add(new Entry(j, Float.parseFloat((String) dataArray.get(i))));
                     }
                     LineDataSet dataSet = new LineDataSet(entries, "Label"); // add entries to dataset
                     dataSet.setCircleColor(R.color.green);
                     dataSet.setValueTextSize(12);
-                    List<ILineDataSet> ILdataSet = new ArrayList<ILineDataSet>();
+                    List<ILineDataSet> ILdataSet = new ArrayList<>();
                     ILdataSet.add(dataSet);
                     dateList.add(DateUtils.getCurrentDateTime());
                     LineData lineData = new LineData(ILdataSet);
@@ -113,11 +118,68 @@ public class VitalsListAdapter extends BaseExpandableListAdapter {
 
                     YAxis rightAxis = chart.getAxisRight();
                     rightAxis.setEnabled(false);
-
-
                     chart.invalidate();
                     layouts.add(convertView);
                 }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        return layouts;
+    }*/
+
+    private List<ViewGroup> generateChildLayouts() {
+        List<ViewGroup> layouts = new ArrayList<>();
+        LayoutInflater inflater = LayoutInflater.from(mContext);
+
+        for (String vitalName : this.mVitalNameList) {
+            ViewGroup convertView = (ViewGroup) inflater.inflate(R.layout.line_chart, null);
+            try {
+                JSONObject chartData = mObservationList.getJSONObject(vitalName);
+                Iterator<String> dates = chartData.keys();
+                ArrayList<String> dateList = Lists.newArrayList(dates);
+                Collections.sort(dateList);
+
+                LineChart chart = (LineChart) convertView.findViewById(R.id.linechart);
+                List<Entry> entries = new ArrayList<>();
+
+                for (Integer j = 0; j < dateList.size(); j++) {
+                    JSONArray dataArray = chartData.getJSONArray(dateList.get(j));
+                    for (Integer i = 0; i < dataArray.length(); i++) {
+                        entries.add(new Entry(j, Float.parseFloat((String) dataArray.get(i))));
+                    }
+                }
+
+                Log.d("ENTRIES SIZE:", String.valueOf(entries.size()));
+
+                LineDataSet dataSet = new LineDataSet(entries, "Label"); // add entries to dataset
+
+                dataSet.setCircleColor(R.color.green);
+                dataSet.setValueTextSize(12);
+                List<ILineDataSet> ILdataSet = new ArrayList<>();
+                ILdataSet.add(dataSet);
+                dateList.add(DateUtils.getCurrentDateTime());
+                LineData lineData = new LineData(ILdataSet);
+                chart.setData(lineData);
+                //Styling the graph
+                chart.getLegend().setEnabled(false);
+                chart.getDescription().setEnabled(false);
+                XAxis xAxis = chart.getXAxis();
+                xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+                xAxis.setDrawAxisLine(true);
+                xAxis.setGranularity(1);
+                xAxis.setAxisMinimum(0);
+                xAxis.setAxisMaximum(dateList.size() -1);
+                xAxis.setValueFormatter(new DayAxisValueFormatter(dateList));
+
+                YAxis rightAxis = chart.getAxisRight();
+                rightAxis.setEnabled(false);
+                chart.invalidate();
+                layouts.add(convertView);
+
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }

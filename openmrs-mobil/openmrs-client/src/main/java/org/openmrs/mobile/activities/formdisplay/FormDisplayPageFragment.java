@@ -155,7 +155,7 @@ public class FormDisplayPageFragment extends ACBaseFragment<FormDisplayContract.
     @Override
     public void createAndAttachNumericQuestionEditText(Question question, LinearLayout sectionLinearLayout) {
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 
         RangeEditText ed = new RangeEditText(getActivity());
         DiscreteSeekBar dsb = new DiscreteSeekBar(getActivity());
@@ -472,9 +472,14 @@ public class FormDisplayPageFragment extends ACBaseFragment<FormDisplayContract.
 
     @Override
     public void createAndAttachTextQuestionEditText(Question question, LinearLayout sectionLinearLayout) {
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-
+        LinearLayout.LayoutParams layoutParams;
+        if (question.getLabel().equalsIgnoreCase("Comment")) {
+            layoutParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        } else {
+            layoutParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        }
         RangeEditText ed = new RangeEditText(getActivity());
         InputField field = new InputField(question.getQuestionOptions().getConcept());
         InputField inputField = getInputField(field.getConcept());
@@ -548,13 +553,13 @@ public class FormDisplayPageFragment extends ACBaseFragment<FormDisplayContract.
         ArrayAdapter arrayAdapter = new ArrayAdapter(getActivity(), android.R.layout.simple_spinner_item, answerLabels);
         spinner.setAdapter(arrayAdapter);
 
-        LinearLayout.LayoutParams linearLayoutParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        // LinearLayout.LayoutParams linearLayoutParams = new LinearLayout.LayoutParams(
+          //      LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 
         questionLinearLayout.addView(textView);
         questionLinearLayout.addView(spinner);
 
-        sectionLinearLayout.setLayoutParams(linearLayoutParams);
+        //sectionLinearLayout.setLayoutParams(linearLayoutParams);
         sectionLinearLayout.addView(questionLinearLayout);
 
         SelectOneField selectOneField = getSelectOneField(spinnerField.getConcept());
@@ -600,13 +605,13 @@ public class FormDisplayPageFragment extends ACBaseFragment<FormDisplayContract.
         SelectOneField radioGroupField = new SelectOneField(question.getQuestionOptions().getAnswers(),
                 question.getQuestionOptions().getConcept());
 
-        LinearLayout.LayoutParams linearLayoutParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        //LinearLayout.LayoutParams linearLayoutParams = new LinearLayout.LayoutParams(
+               // LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 
         sectionLinearLayout.addView(textView);
         sectionLinearLayout.addView(radioGroup);
 
-        sectionLinearLayout.setLayoutParams(linearLayoutParams);
+        //sectionLinearLayout.setLayoutParams(linearLayoutParams);
 
         SelectOneField selectOneField = getSelectOneField(radioGroupField.getConcept());
         if (selectOneField != null) {
@@ -642,6 +647,7 @@ public class FormDisplayPageFragment extends ACBaseFragment<FormDisplayContract.
         tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
         tv.setTextColor(ContextCompat.getColor(getActivity(), R.color.primary));
         questionLinearLayout.addView(tv, layoutParams);
+        questionLinearLayout.setPadding(20,20,20,20);
 
         return questionLinearLayout;
     }

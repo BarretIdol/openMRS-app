@@ -63,73 +63,6 @@ public class VitalsListAdapter extends BaseExpandableListAdapter {
         this.mChildLayouts = generateChildLayouts();
     }
 
-
-    /*private List<ViewGroup> generateChildLayouts() {
-        List<ViewGroup> layouts = new ArrayList<>();
-        LayoutInflater inflater = LayoutInflater.from(mContext);
-
-        for (String vitalName : this.mVitalNameList) {
-            ViewGroup convertView = (ViewGroup) inflater.inflate(R.layout.line_chart, null);
-            try {
-                JSONObject chartData = mObservationList.getJSONObject(vitalName);
-                Iterator<String> dates = chartData.keys();
-                ArrayList<String> dateList = Lists.newArrayList(dates);
-                //Sorting the date
-                *//*Collections.sort(dateList, new Comparator<String>() {
-                    @Override
-                    public int compare(String lhs, String rhs) {
-                        Log.d("chart dates: ", DateUtils.getDateFromString(lhs, DateUtils.DATE_WITH_TIME_FORMAT).getTime() + "-----" + DateUtils.getDateFromString(rhs, DateUtils.DATE_WITH_TIME_FORMAT).getTime());
-                        if (DateUtils.getDateFromString(lhs).getTime() < DateUtils.getDateFromString(rhs).getTime())
-                            return -1;
-                        else if (DateUtils.getDateFromString(lhs).getTime() == DateUtils.getDateFromString(rhs).getTime())
-                            return 0;
-                        else
-                            return 1;
-                    }
-                });*//*
-                Collections.sort(dateList);
-
-                for (Integer j = 0; j < dateList.size(); j++) {
-                    Log.d("VITALS", chartData.toString() + "-Searching: " + dateList.get(j));
-                    JSONArray dataArray = chartData.getJSONArray(dateList.get(j));
-                    LineChart chart = (LineChart) convertView.findViewById(R.id.linechart);
-                    List<Entry> entries = new ArrayList<>();
-                    for (Integer i = 0; i < dataArray.length(); i++) {
-                        entries.add(new Entry(j, Float.parseFloat((String) dataArray.get(i))));
-                    }
-                    LineDataSet dataSet = new LineDataSet(entries, "Label"); // add entries to dataset
-                    dataSet.setCircleColor(R.color.green);
-                    dataSet.setValueTextSize(12);
-                    List<ILineDataSet> ILdataSet = new ArrayList<>();
-                    ILdataSet.add(dataSet);
-                    dateList.add(DateUtils.getCurrentDateTime());
-                    LineData lineData = new LineData(ILdataSet);
-                    chart.setData(lineData);
-                    //Styling the graph
-                    chart.getLegend().setEnabled(false);
-                    chart.getDescription().setEnabled(false);
-                    XAxis xAxis = chart.getXAxis();
-                    xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-                    xAxis.setDrawAxisLine(true);
-                    xAxis.setGranularity(1);
-                    xAxis.setAxisMinimum(0);
-                    xAxis.setAxisMaximum(dateList.size() -1);
-                    xAxis.setValueFormatter(new DayAxisValueFormatter(dateList));
-
-                    YAxis rightAxis = chart.getAxisRight();
-                    rightAxis.setEnabled(false);
-                    chart.invalidate();
-                    layouts.add(convertView);
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-        }
-
-        return layouts;
-    }*/
-
     private List<ViewGroup> generateChildLayouts() {
         List<ViewGroup> layouts = new ArrayList<>();
         LayoutInflater inflater = LayoutInflater.from(mContext);
@@ -151,8 +84,6 @@ public class VitalsListAdapter extends BaseExpandableListAdapter {
                         entries.add(new Entry(j, Float.parseFloat((String) dataArray.get(i))));
                     }
                 }
-
-                Log.d("ENTRIES SIZE:", String.valueOf(entries.size()));
 
                 LineDataSet dataSet = new LineDataSet(entries, "Label"); // add entries to dataset
 

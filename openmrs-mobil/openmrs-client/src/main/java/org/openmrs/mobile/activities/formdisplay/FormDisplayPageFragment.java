@@ -3,13 +3,14 @@
  * v. 2.0. If a copy of the MPL was not distributed with this file, You can
  * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
  * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
- *
+ * <p>
  * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
  * graphic logo is a trademark of OpenMRS Inc.
  */
 
 package org.openmrs.mobile.activities.formdisplay;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -17,6 +18,7 @@ import android.app.ProgressDialog;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -25,6 +27,7 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.Editable;
@@ -69,12 +72,13 @@ import org.openmrs.mobile.utilities.ToastUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
 
-public class FormDisplayPageFragment extends ACBaseFragment<FormDisplayContract.Presenter.PagePresenter> implements FormDisplayContract.View.PageView{
+public class FormDisplayPageFragment extends ACBaseFragment<FormDisplayContract.Presenter.PagePresenter> implements FormDisplayContract.View.PageView {
 
-    public static final String CONCEPT_BMI_UUID = ApplicationConstants.ConceptUuids.BMI ;
+    public static final String CONCEPT_BMI_UUID = ApplicationConstants.ConceptUuids.BMI;
     private List<InputField> inputFields = new ArrayList<>();
     private List<SelectOneField> selectOneFields = new ArrayList<>();
     private LinearLayout mParent;
@@ -82,12 +86,12 @@ public class FormDisplayPageFragment extends ACBaseFragment<FormDisplayContract.
     private boolean bReconnect;
     ProgressDialog mPDialog;
     BleWrapper mBleWrapper;
-    private static final String TAG_CLASS="FDispPageFrag.java";
+    private static final String TAG_CLASS = "FDispPageFrag.java";
     private RangeEditText mEditTextSystolic;
-    private RangeEditText mEditTextDiastolic,mEditTextPulseRate;
+    private RangeEditText mEditTextDiastolic, mEditTextPulseRate;
     private TextView mTxtView;
-    private ArrayList<Integer> mListSystolic,mListDiastolic,mListPulse;
-    int mDiastolic,mSystolic, mPulse;
+    private ArrayList<Integer> mListSystolic, mListDiastolic, mListPulse;
+    int mDiastolic, mSystolic, mPulse;
     private Context mContext;
     private RangeEditText mLatitude;
     private RangeEditText mLongitude;
@@ -106,11 +110,11 @@ public class FormDisplayPageFragment extends ACBaseFragment<FormDisplayContract.
                 WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 
         mParent = (LinearLayout) root.findViewById(R.id.sectionContainer);
-        mListDiastolic=new ArrayList<>();
-        mListSystolic=new ArrayList<>();
-        mListPulse=new ArrayList<>();
+        mListDiastolic = new ArrayList<>();
+        mListSystolic = new ArrayList<>();
+        mListPulse = new ArrayList<>();
         mContext = super.getContext();
-       // notifyTreatment();
+        // notifyTreatment();
         return root;
     }
 
@@ -147,6 +151,7 @@ public class FormDisplayPageFragment extends ACBaseFragment<FormDisplayContract.
         section.addView(question);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
     public void createAndAttachNumericQuestionEditText(Question question, LinearLayout sectionLinearLayout) {
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
@@ -164,25 +169,25 @@ public class FormDisplayPageFragment extends ACBaseFragment<FormDisplayContract.
         }
         sectionLinearLayout.addView(generateTextView(question.getLabel()));
         if (question.getLabel().equalsIgnoreCase("Latitude")) {
-            mLatitude=ed;
-            gps = new Gps(this.mContext,new Gps.GPSListener() {
+            mLatitude = ed;
+            gps = new Gps(this.mContext, new Gps.GPSListener() {
 
                 @Override
                 public void onGPSResult() {
                     mLatitude.setText(String.valueOf(gps.getLatitude()));
                 }
-            } );
+            });
             gps.makeMeasurement();
         }
         if (question.getLabel().equalsIgnoreCase("Longitude")) {
-            mLongitude=ed;
-            gps = new Gps(this.mContext,new Gps.GPSListener() {
+            mLongitude = ed;
+            gps = new Gps(this.mContext, new Gps.GPSListener() {
 
                 @Override
                 public void onGPSResult() {
                     mLongitude.setText(String.valueOf(gps.getLongitude()));
                 }
-            } );
+            });
             gps.makeMeasurement();
         }
         if (question.getLabel().equalsIgnoreCase("BMI (kg/m2):")) {
@@ -228,7 +233,7 @@ public class FormDisplayPageFragment extends ACBaseFragment<FormDisplayContract.
                     }
                 });
             if (question.getLabel().contentEquals("BP:Systolic:")) {
-                mEditTextSystolic=ed;
+                mEditTextSystolic = ed;
                 mEditTextSystolic.addTextChangedListener(new TextWatcher() {
                     @Override
                     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -243,9 +248,9 @@ public class FormDisplayPageFragment extends ACBaseFragment<FormDisplayContract.
                     @Override
                     public void afterTextChanged(Editable s) {
                         String value = s.toString();
-                       if (StringUtils.notEmpty(value) && Long.parseLong(value) >= 140) {
-                           notifyTreatment();
-                       }
+                        if (StringUtils.notEmpty(value) && Long.parseLong(value) >= 140) {
+                            notifyTreatment();
+                        }
                     }
                 });
             }
@@ -270,27 +275,27 @@ public class FormDisplayPageFragment extends ACBaseFragment<FormDisplayContract.
                         }
                     }
                 });
-           }
-            if (question.getLabel().contentEquals("Pulse(Rate/Min):")){
-                    mEditTextPulseRate=ed;
-                mTxtView=generateTextView("Number of measurements: 0");
+            }
+            if (question.getLabel().contentEquals("Pulse(Rate/Min):")) {
+                mEditTextPulseRate = ed;
+                mTxtView = generateTextView("Number of measurements: 0");
                 sectionLinearLayout.addView(mTxtView, layoutParams);
 
 
                 Log.d(TAG_CLASS, "create Button");
              /*   ImageButton bluetoothButton= new ImageButton(getContext());
                 bluetoothButton.setImageDrawable(getResources().getDrawable(R.drawable.ico_vitals_small));*/
-                Button bluetoothButton=new Button(getContext());
+                Button bluetoothButton = new Button(getContext());
                 bluetoothButton.setText("Get measurement");
                 bluetoothButton.setEnabled(true);
-                mPDialog= new ProgressDialog(this.getActivity());
+                mPDialog = new ProgressDialog(this.getActivity());
                 mPDialog.setMessage("Connecting to blood pressure monitor it can take over 6 seconds");
                 mPDialog.setIndeterminate(true);
                 mPDialog.setCancelable(true);
                 mPDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
                     @Override
                     public void onCancel(DialogInterface dialog) {
-                        bReconnect=false;
+                        bReconnect = false;
                         mBleWrapper.stopScanning();
                         mBleWrapper.diconnect();
                         mBleWrapper.close();
@@ -300,161 +305,162 @@ public class FormDisplayPageFragment extends ACBaseFragment<FormDisplayContract.
                     }
                 });
 
-                bluetoothButton.setOnClickListener(view->{
+                bluetoothButton.setOnClickListener((View view) -> {
                     bluetoothButton.setEnabled(false);
-                            mPDialog.show();
-                            bReconnect=true;
+                    mPDialog.show();
+                    bReconnect = true;
 
-                            mBleWrapper= new BleWrapper(getContext(), new BleWrapperUiCallbacks() {
-                                @Override
-                                public void uiDeviceFound(BluetoothDevice device, int rssi, byte[] record) {
-                                    Log.d(TAG_CLASS, "uiDeviceFound" + device.getName());
-                                    if (device.getName().startsWith("0")) { //ModeNormal
-                                        if (PressureMonitorUtils.checkAccountID(getContext(), device.getName())) {
-                                            Log.d(TAG_CLASS, "uiDeviceFound registered" + device.getName());
-                                            mBleWrapper.stopScanning();
-                                            mBleWrapper.connect(device.getAddress());
-                                            if (mToast!=null)
-                                                mToast.cancel();
-                                        } else {
-                                            if (mToast!=null)
-                                                mToast.cancel();
-                                            mToast = Toast.makeText(getContext(), "Device must be paired before transferring data", Toast.LENGTH_SHORT);
-                                            mToast.show();
-                                            Log.d(TAG_CLASS, "uiDeviceFound not registered" + device.getName());
-                                        }
+                    mBleWrapper = new BleWrapper(getContext(), new BleWrapperUiCallbacks() {
+                        @Override
+                        public void uiDeviceFound(BluetoothDevice device, int rssi, byte[] record) {
+                            Log.d(TAG_CLASS, "uiDeviceFound" + device.getName());
+                            if (device.getName().startsWith("0")) { //ModeNormal
+                                if (PressureMonitorUtils.checkAccountID(getContext(), device.getName())) {
+                                    Log.d(TAG_CLASS, "uiDeviceFound registered" + device.getName());
+                                    mBleWrapper.stopScanning();
+                                    mBleWrapper.connect(device.getAddress());
+                                    if (mToast != null)
+                                        mToast.cancel();
+                                } else {
+                                    if (mToast != null)
+                                        mToast.cancel();
+                                    mToast = Toast.makeText(getContext(), "Device must be paired before transferring data", Toast.LENGTH_SHORT);
+                                    mToast.show();
+                                    Log.d(TAG_CLASS, "uiDeviceFound not registered" + device.getName());
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void uiDeviceConnected(BluetoothGatt gatt, BluetoothDevice device) {
+                            Log.d(TAG_CLASS, "uiDeviceConnected" + device.getName());
+
+                        }
+
+                        @Override
+                        public void uiDeviceDisconnected(BluetoothGatt gatt, BluetoothDevice device) {
+                            Log.d(TAG_CLASS, "uiDeviceDisconnected" + device.getName());
+                            if (bReconnect)
+                                mBleWrapper.connect(device.getAddress());
+
+                        }
+
+                        @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+                        @Override
+                        public void uiAvailableServices(BluetoothGatt gatt, BluetoothDevice device, List<BluetoothGattService> services) {
+                            bReconnect = false;
+                            Log.d(TAG_CLASS, "uiAvailableServices name" + device.getName());
+                            Log.d(TAG_CLASS, "getService PPRESS");
+                            String acountID = device.getName().substring(1, 6);
+                            Log.d(TAG_CLASS, "uiAvailableServices account id" + acountID);
+                            BluetoothGattService service = gatt.getService(BleDefinedUUIDs.Service.CUSTOM_SERVICE);
+                            if (service == null)
+                                Log.d(TAG_CLASS, "Could not get CUSTOM_SERVICE Service");
+                            else {
+                                Log.d(TAG_CLASS, "Heart Rate Service successfully retrieved");
+                                mBleWrapper.getCharacteristicsForService(service);
+                            }
+                        }
+
+                        @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+                        @Override
+                        public void uiCharacteristicForService(BluetoothGatt gatt, BluetoothDevice device, BluetoothGattService service, List<BluetoothGattCharacteristic> chars) {
+                            Log.d(TAG_CLASS, "uiCharacteristicForService");
+                            BluetoothGattCharacteristic btch = service
+                                    .getCharacteristic(BleDefinedUUIDs.Characteristic.READ_RANDOM_CHARACTERISITIC);
+                            if (btch == null) {
+                                Log.d(TAG_CLASS,
+                                        "Could not find READ_RANDOM_CHARACTERISITIC Characteristic");
+                            } else {
+                                Log.d(TAG_CLASS,
+                                        "READ_RANDOM_CHARACTERISITIC retrieved properly");
+                                mBleWrapper.setNotificationForCharacteristic(btch, true);
+                            }
+                        }
+
+                        @Override
+                        public void uiCharacteristicsDetails(BluetoothGatt gatt, BluetoothDevice device, BluetoothGattService service, BluetoothGattCharacteristic characteristic) {
+                            Log.d(TAG_CLASS, "uiCharacteristicsDetails");
+
+                        }
+
+                        @Override
+                        public void uiNewValueForCharacteristic(BluetoothGatt gatt, BluetoothDevice device, BluetoothGattService service, BluetoothGattCharacteristic ch, String strValue, int intValue, byte[] rawValue, String timestamp) {
+
+                        }
+
+                        @Override
+                        public void uiNewValueHRForCharacteristic(BluetoothGatt gatt, BluetoothDevice device, BluetoothGattService service, BluetoothGattCharacteristic ch, String strValue, int intValue, byte[] rawValue, String timestamp) {
+
+                        }
+
+                        @Override
+                        public void uiGotNotification(BluetoothGatt gatt, BluetoothDevice device, BluetoothGattService service, BluetoothGattCharacteristic characteristic) {
+
+                        }
+
+                        @Override
+                        public void uiSuccessfulWrite(BluetoothGatt gatt, BluetoothDevice device, BluetoothGattService service, BluetoothGattCharacteristic ch, String description) {
+                            Log.d(TAG_CLASS, "uiSuccessfulWrite");
+                        }
+
+                        @Override
+                        public void uiFailedWrite(BluetoothGatt gatt, BluetoothDevice device, BluetoothGattService service, BluetoothGattCharacteristic ch, String description) {
+
+                        }
+
+                        @Override
+                        public void uiNewRssiAvailable(BluetoothGatt gatt, BluetoothDevice device, int rssi) {
+
+                        }
+
+                        @Override
+                        public void uiNewValuePressForCharacteristic(BluetoothGatt gatt, BluetoothDevice device, BluetoothGattService service, int systolic, int diastolic, int hr) {
+                            Log.d(TAG_CLASS, "uiNewValuePressForCharacteristic");
+                            mPDialog.dismiss();
+                            Log.d(TAG_CLASS, "ui systolic: " + systolic + " diastolic: " + diastolic);
+                            if (mListSystolic.size() < 3) {
+                                mListSystolic.add(systolic);
+                                mListDiastolic.add(diastolic);
+                                mListPulse.add(hr);
+                                mDiastolic = 0;
+                                mSystolic = 0;
+                                mPulse = 0;
+                                for (int i = 0; i < mListDiastolic.size(); i++) {
+                                    mSystolic += mListSystolic.get(i);
+                                    mDiastolic += mListDiastolic.get(i);
+                                    mPulse += mListPulse.get(i);
+                                }
+                                mSystolic = mSystolic / mListSystolic.size();
+                                mDiastolic = mDiastolic / mListDiastolic.size();
+                                mPulse = mPulse / mListPulse.size();
+
+                                getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Log.d(TAG_CLASS, "ui setEditText measure #: " + mListSystolic.size());
+                                        mTxtView.setText("Number of measurements: " + mListSystolic.size());
+                                        mEditTextSystolic.setText(String.valueOf(mSystolic));
+                                        mEditTextDiastolic.setText(String.valueOf(mDiastolic));
+                                        if (mEditTextPulseRate != null)
+                                            mEditTextPulseRate.setText(String.valueOf(mPulse));
+                                        if (mListPulse.size() < 3)
+                                            bluetoothButton.setEnabled(true);
+                                        else
+                                            bluetoothButton.setEnabled(false);
                                     }
-                                }
-
-                                @Override
-                                public void uiDeviceConnected(BluetoothGatt gatt, BluetoothDevice device) {
-                                    Log.d(TAG_CLASS,"uiDeviceConnected"+ device.getName());
-
-                                }
-
-                                @Override
-                                public void uiDeviceDisconnected(BluetoothGatt gatt, BluetoothDevice device) {
-                                    Log.d(TAG_CLASS,"uiDeviceDisconnected"+ device.getName());
-                                    if (bReconnect)
-                                        mBleWrapper.connect(device.getAddress());
-
-                                }
-
-                                @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-                                @Override
-                                public void uiAvailableServices(BluetoothGatt gatt, BluetoothDevice device, List<BluetoothGattService> services) {
-                                    bReconnect=false;
-                                    Log.d(TAG_CLASS, "uiAvailableServices name" + device.getName());
-                                    Log.d(TAG_CLASS, "getService PPRESS");
-                                    String acountID = device.getName().substring(1, 6);
-                                    Log.d(TAG_CLASS, "uiAvailableServices account id" + acountID);
-                                    BluetoothGattService service = gatt.getService(BleDefinedUUIDs.Service.CUSTOM_SERVICE);
-                                    if (service == null)
-                                        Log.d(TAG_CLASS, "Could not get CUSTOM_SERVICE Service");
-                                    else {
-                                        Log.d(TAG_CLASS, "Heart Rate Service successfully retrieved");
-                                        mBleWrapper.getCharacteristicsForService(service);
-                                    }
-                                }
-
-                                @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-                                @Override
-                                public void uiCharacteristicForService(BluetoothGatt gatt, BluetoothDevice device, BluetoothGattService service, List<BluetoothGattCharacteristic> chars) {
-                                    Log.d(TAG_CLASS, "uiCharacteristicForService");
-                                    BluetoothGattCharacteristic btch = service
-                                            .getCharacteristic(BleDefinedUUIDs.Characteristic.READ_RANDOM_CHARACTERISITIC);
-                                    if (btch == null) {
-                                        Log.d(TAG_CLASS,
-                                                "Could not find READ_RANDOM_CHARACTERISITIC Characteristic");
-                                    } else {
-                                        Log.d(TAG_CLASS,
-                                                "READ_RANDOM_CHARACTERISITIC retrieved properly");
-                                        mBleWrapper.setNotificationForCharacteristic(btch, true);
-                                    }
-                                }
-
-                                @Override
-                                public void uiCharacteristicsDetails(BluetoothGatt gatt, BluetoothDevice device, BluetoothGattService service, BluetoothGattCharacteristic characteristic) {
-                                    Log.d(TAG_CLASS, "uiCharacteristicsDetails");
-
-                                }
-
-                                @Override
-                                public void uiNewValueForCharacteristic(BluetoothGatt gatt, BluetoothDevice device, BluetoothGattService service, BluetoothGattCharacteristic ch, String strValue, int intValue, byte[] rawValue, String timestamp) {
-
-                                }
-
-                                @Override
-                                public void uiNewValueHRForCharacteristic(BluetoothGatt gatt, BluetoothDevice device, BluetoothGattService service, BluetoothGattCharacteristic ch, String strValue, int intValue, byte[] rawValue, String timestamp) {
-
-                                }
-
-                                @Override
-                                public void uiGotNotification(BluetoothGatt gatt, BluetoothDevice device, BluetoothGattService service, BluetoothGattCharacteristic characteristic) {
-
-                                }
-
-                                @Override
-                                public void uiSuccessfulWrite(BluetoothGatt gatt, BluetoothDevice device, BluetoothGattService service, BluetoothGattCharacteristic ch, String description) {
-                                    Log.d(TAG_CLASS, "uiSuccessfulWrite");
-                                }
-
-                                @Override
-                                public void uiFailedWrite(BluetoothGatt gatt, BluetoothDevice device, BluetoothGattService service, BluetoothGattCharacteristic ch, String description) {
-
-                                }
-
-                                @Override
-                                public void uiNewRssiAvailable(BluetoothGatt gatt, BluetoothDevice device, int rssi) {
-
-                                }
-
-                                @Override
-                                public void uiNewValuePressForCharacteristic(BluetoothGatt gatt, BluetoothDevice device, BluetoothGattService service, int systolic, int diastolic, int hr) {
-                                    Log.d(TAG_CLASS,"uiNewValuePressForCharacteristic");
-                                    mPDialog.dismiss();
-                                    Log.d(TAG_CLASS,"ui systolic: "+systolic+" diastolic: "+diastolic);
-                                    if(mListSystolic.size()<3) {
-                                        mListSystolic.add(systolic);
-                                        mListDiastolic.add(diastolic);
-                                        mListPulse.add(hr);
-                                        mDiastolic = 0;
-                                        mSystolic = 0;
-                                        mPulse = 0;
-                                        for (int i = 0; i < mListDiastolic.size(); i++) {
-                                            mSystolic += mListSystolic.get(i);
-                                            mDiastolic += mListDiastolic.get(i);
-                                            mPulse += mListPulse.get(i);
-                                        }
-                                        mSystolic = mSystolic / mListSystolic.size();
-                                        mDiastolic = mDiastolic / mListDiastolic.size();
-                                        mPulse = mPulse / mListPulse.size();
-
-                                        getActivity().runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                Log.d(TAG_CLASS,"ui setEditText measure #: "+mListSystolic.size());
-                                                mTxtView.setText("Number of measurements: "+mListSystolic.size());
-                                                mEditTextSystolic.setText(String.valueOf(mSystolic));
-                                                mEditTextDiastolic.setText(String.valueOf(mDiastolic));
-                                                if(mEditTextPulseRate!=null)
-                                                    mEditTextPulseRate.setText(String.valueOf(mPulse));
-                                                if(mListPulse.size()<3)
-                                                bluetoothButton.setEnabled(true);
-                                                else
-                                                    bluetoothButton.setEnabled(false);
-                                            }
-                                        });
-                                    }
-                                }
+                                });
+                            }
+                        }
 
 
-                            });
+                    });
 
-                    if ( mBleWrapper.initialize())
+                    if (mBleWrapper.initialize()) {
                         mBleWrapper.startScanningCustom(true);
-                    else
+                    } else {
                         mPDialog.cancel();
+                    }
 
                 });
                 sectionLinearLayout.addView(bluetoothButton, layoutParams);
@@ -681,13 +687,13 @@ public class FormDisplayPageFragment extends ACBaseFragment<FormDisplayContract.
         for (InputField field : inputFields) {
             String pes = "0";
             String altura = "0";
-            if (inputFields.size()>3) {
-                 pes = inputFields.get(3).getValue();
-                 altura = inputFields.get(4).getValue();
+            if (inputFields.size() > 3) {
+                pes = inputFields.get(3).getValue();
+                altura = inputFields.get(4).getValue();
             }
             if (field.getConcept().equalsIgnoreCase(CONCEPT_BMI_UUID) && StringUtils.notEmpty(pes) && StringUtils.notEmpty(altura)) {
                 Double pesD = Double.parseDouble(pes);
-                Double alturaD =Double.parseDouble(altura);
+                Double alturaD = Double.parseDouble(altura);
                 Double bmi = pesD * 100 * 100 / (alturaD * alturaD);
                 Log.d("checkinputfieled.java", "check BMI:" + bmi.toString());
                 field.setValue(String.valueOf(bmi));
@@ -734,13 +740,16 @@ public class FormDisplayPageFragment extends ACBaseFragment<FormDisplayContract.
                         nInputFields++;
                         allEmpty = false;
                         if (ed.getText().toString().charAt(0) != '.') {
-                            try {Double inp = Double.parseDouble(ed.getText().toString());
+                            try {
+                                Double inp = Double.parseDouble(ed.getText().toString());
 
-                            if (ed.getUpperlimit() != -1.0 && ed.getUpperlimit() != -1.0 && (ed.getUpperlimit() < inp || ed.getLowerlimit() > inp)) {
-                                ed.setTextColor(ContextCompat.getColor(OpenMRS.getInstance(), R.color.red));
-                                valid = false;
-                            }}
-                            catch (RuntimeException e) { Log.d("FormDisplayPageFragment","Can't convert to double " + ed.getText().toString()); }
+                                if (ed.getUpperlimit() != -1.0 && ed.getUpperlimit() != -1.0 && (ed.getUpperlimit() < inp || ed.getLowerlimit() > inp)) {
+                                    ed.setTextColor(ContextCompat.getColor(OpenMRS.getInstance(), R.color.red));
+                                    valid = false;
+                                }
+                            } catch (RuntimeException e) {
+                                Log.d("FormDisplayPageFragment", "Can't convert to double " + ed.getText().toString());
+                            }
                         } else {
                             ed.setTextColor(ContextCompat.getColor(OpenMRS.getInstance(), R.color.red));
                             valid = false;
@@ -777,9 +786,9 @@ public class FormDisplayPageFragment extends ACBaseFragment<FormDisplayContract.
         return etText.getText().toString().trim().length() == 0;
     }
 
-    private void updateBMI(){
-        inputFields=getInputFields();
-        for( InputField field:inputFields) {
+    private void updateBMI() {
+        inputFields = getInputFields();
+        for (InputField field : inputFields) {
             String pes = inputFields.get(3).getValue();
             String altura = inputFields.get(4).getValue();
             if (field.getConcept().equalsIgnoreCase(CONCEPT_BMI_UUID) &&
@@ -788,7 +797,7 @@ public class FormDisplayPageFragment extends ACBaseFragment<FormDisplayContract.
                 Double alturaD = Double.parseDouble(inputFields.get(4).getValue());
                 Double bmi = pesD * 100 * 100 / (alturaD * alturaD);
                 TextView tv = (TextView) getActivity().findViewById(field.getId());
-                if (pesD==-1.0F || alturaD==-1.0F)
+                if (pesD == -1.0F || alturaD == -1.0F)
                     tv.setText(new String());
                 else {
                     Log.d("checkinputfieled.java", "check BMI:" + bmi.toString());
@@ -796,12 +805,12 @@ public class FormDisplayPageFragment extends ACBaseFragment<FormDisplayContract.
                     int aux = (int) (Float.parseFloat(field.getValue()) * 100);
                     Float valor = aux / 100.f;
                     tv.setText(valor.toString());
-                    if (valor >40 || valor<20)
+                    if (valor > 40 || valor < 20)
                         tv.setTextColor(Color.RED);
                     else if (valor > 30)
-                        tv.setTextColor(Color.rgb(255,165,0));
-                    else if (valor>25)
-                        tv.setTextColor(Color.rgb(255,220,0));
+                        tv.setTextColor(Color.rgb(255, 165, 0));
+                    else if (valor > 25)
+                        tv.setTextColor(Color.rgb(255, 220, 0));
                     else
                         tv.setTextColor(Color.GREEN);
                 }
@@ -811,26 +820,24 @@ public class FormDisplayPageFragment extends ACBaseFragment<FormDisplayContract.
 
     private void notifyTreatment() {
         NotificationCompat.Builder mBuilder;
-        NotificationManager mNotifyMgr =(NotificationManager) mContext.
+        NotificationManager mNotifyMgr = (NotificationManager) mContext.
                 getApplicationContext().getSystemService(NOTIFICATION_SERVICE);
 
         int icono = R.drawable.ic_openmrs;
         PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, new Intent(), 0);
 
-        mBuilder =new NotificationCompat.Builder(mContext.getApplicationContext())
+        mBuilder = new NotificationCompat.Builder(mContext.getApplicationContext())
                 .setContentIntent(pendingIntent)
                 .setSmallIcon(icono)
                 .setContentTitle("High Blood Pressure")
                 .setContentText("Patient has high blood pressure")
-                .setVibrate(new long[] {100, 250, 100, 500})
+                .setVibrate(new long[]{100, 250, 100, 500})
                 .setAutoCancel(true);
-
 
 
         mNotifyMgr.notify(1, mBuilder.build());
 
     }
-
 
 
 }

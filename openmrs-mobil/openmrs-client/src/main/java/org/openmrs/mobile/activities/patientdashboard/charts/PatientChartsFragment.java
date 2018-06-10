@@ -172,25 +172,10 @@ public class PatientChartsFragment extends PatientDashboardFragment implements P
                 }
             }
         }
-        // }
-
 
         VitalsListAdapter vitalsListAdapter = new VitalsListAdapter(this.getActivity(), observationList);
         mExpandableListView.setAdapter(vitalsListAdapter);
         mExpandableListView.setGroupIndicator(null);
-/*        mExpandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
-
-            @Override
-            public void onGroupExpand(int groupPosition) {
-                if (lastExpandedPosition != -1
-                        && groupPosition != lastExpandedPosition) {
-                    mExpandableListView.collapseGroup(lastExpandedPosition);
-                }
-                lastExpandedPosition = groupPosition;
-            }
-        });
-        //}*/
-
 
     }
 

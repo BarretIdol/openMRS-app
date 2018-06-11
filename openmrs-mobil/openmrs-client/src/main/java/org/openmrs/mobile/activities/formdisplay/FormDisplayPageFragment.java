@@ -10,7 +10,6 @@
 
 package org.openmrs.mobile.activities.formdisplay;
 
-import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -18,7 +17,6 @@ import android.app.ProgressDialog;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
-import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -72,7 +70,6 @@ import org.openmrs.mobile.utilities.ToastUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
 
@@ -97,6 +94,7 @@ public class FormDisplayPageFragment extends ACBaseFragment<FormDisplayContract.
     private RangeEditText mLongitude;
     long mPatientID;
     Gps gps;
+    private static final int MAX_MEASUREMENTS = 3;
 
     public static FormDisplayPageFragment newInstance() {
         return new FormDisplayPageFragment();
@@ -419,7 +417,7 @@ public class FormDisplayPageFragment extends ACBaseFragment<FormDisplayContract.
                             Log.d(TAG_CLASS, "uiNewValuePressForCharacteristic");
                             mPDialog.dismiss();
                             Log.d(TAG_CLASS, "ui systolic: " + systolic + " diastolic: " + diastolic);
-                            if (mListSystolic.size() < 3) {
+                            if (mListSystolic.size() < MAX_MEASUREMENTS) {
                                 mListSystolic.add(systolic);
                                 mListDiastolic.add(diastolic);
                                 mListPulse.add(hr);
